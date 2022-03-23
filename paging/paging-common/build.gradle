@@ -42,6 +42,8 @@ kotlin {
         }
         commonTest {
             dependencies {
+                implementation(libs.kotlinTestCommon)
+                implementation(libs.kotlinTestAnnotationsCommon)
                 implementation(libs.kotlinCoroutinesTest)
             }
         }
@@ -51,6 +53,7 @@ kotlin {
         }
         jsTest {
             dependencies {
+                implementation(libs.kotlinTestJs)
             }
         }
         jvmMain {
@@ -61,10 +64,9 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation(libs.junit)
                 implementation(project(":internal-testutils-ktx"))
                 implementation(project(":internal-testutils-paging"))
-                implementation(libs.kotlinTest)
+                implementation(libs.kotlinTestJunit)
                 implementation(libs.truth)
             }
         }

@@ -22,6 +22,9 @@ import androidx.paging.ActiveFlowTracker.FlowType
 import androidx.paging.ActiveFlowTracker.FlowType.PAGED_DATA_FLOW
 import androidx.paging.ActiveFlowTracker.FlowType.PAGE_EVENT_FLOW
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.test.AfterTest
+import kotlin.test.Test
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,13 +44,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.yield
-import org.junit.After
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.test.runCurrent
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(JUnit4::class)
@@ -56,7 +56,7 @@ class CachingTest {
 
     private val tracker = ActiveFlowTrackerImpl()
 
-    @After
+    @AfterTest
     fun checkResources() {
         try {
             testScope.cleanupTestCoroutines()
@@ -334,7 +334,7 @@ class CachingTest {
      * invalidations create new PagingData BUT a new collector only sees the latest one.
      */
     @Test
-    public fun unusedPagingDataIsNeverCollectedByNewDownstream(): Unit = testScope.wrapRunTest {
+    fun unusedPagingDataIsNeverCollectedByNewDownstream(): Unit = testScope.wrapRunTest {
         val factory = StringPagingSource.VersionedFactory()
         val flow = buildPageFlow(factory).cachedIn(testScope, tracker)
         val collector = ItemCollector(flow)
@@ -461,9 +461,9 @@ class CachingTest {
                                     presentedItemsBefore = it.pages.sumOf { it.data.size } - 1,
                                     presentedItemsAfter = 0,
                                     originalPageOffsetFirst =
-                                        it.pages.first().originalPageOffsets.minOrNull()!!,
+                                    it.pages.first().originalPageOffsets.minOrNull()!!,
                                     originalPageOffsetLast =
-                                        it.pages.last().originalPageOffsets.maxOrNull()!!
+                                    it.pages.last().originalPageOffsets.maxOrNull()!!
                                 )
                             )
                         } else {
@@ -504,7 +504,7 @@ class CachingTest {
 
         private suspend fun collectPassively() {
             source.collect {
-                receivedPagingDataCount ++
+                receivedPagingDataCount++
                 // clear to latest
                 val list = mutableListOf<Item>()
                 items = list
@@ -577,6 +577,7 @@ class CachingTest {
             fun create() = StringPagingSource(nextVersion++).also {
                 latestSource = it
             }
+
             fun invalidateLatest() = latestSource?.invalidate()
         }
     }

@@ -190,7 +190,7 @@ internal fun <T : Any> remoteLoadStateUpdate(
 
 private fun <T : Any> emptyPage() = TransformablePage<T>(0, emptyList())
 
-public fun <E> MutableList<E>.getAllAndClear(): List<E> {
+fun <E> MutableList<E>.getAllAndClear(): List<E> {
     val data = toList()
     repeat(data.size) { removeFirst() }
     return data
