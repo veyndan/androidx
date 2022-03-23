@@ -85,11 +85,12 @@ class FlowExtTest {
 
     @Test
     fun runningReduce_empty() = testScope.runTest {
-        assertThat(
+        assertTrue(
             emptyFlow<Int>().simpleRunningReduce { acc, value ->
                 acc + value
             }.toList()
-        ).isEmpty()
+                .isEmpty()
+        )
     }
 
     @Test
@@ -110,11 +111,12 @@ class FlowExtTest {
 
     @Test
     fun mapLatest_empty() = testScope.runTest {
-        assertThat(
+        assertTrue(
             emptyFlow<Int>().simpleMapLatest { value ->
                 "$value-$value"
             }.toList()
-        ).isEmpty()
+                .isEmpty()
+        )
     }
 
     @Test
@@ -138,12 +140,13 @@ class FlowExtTest {
 
     @Test
     fun flatMapLatest_empty() = testScope.runTest {
-        assertThat(
+        assertTrue(
             emptyFlow<Int>()
                 .simpleFlatMapLatest {
                     flowOf(it)
                 }.toList()
-        ).isEmpty()
+                .isEmpty()
+        )
     }
 
     @Test
@@ -162,11 +165,11 @@ class FlowExtTest {
 
         flow1.send(1)
         advanceUntilIdle()
-        assertThat(result).isEmpty()
+        assertTrue(result.isEmpty())
 
         flow1.send(2)
         advanceUntilIdle()
-        assertThat(result).isEmpty()
+        assertTrue(result.isEmpty())
 
         flow2.send("A")
         advanceUntilIdle()
@@ -215,11 +218,11 @@ class FlowExtTest {
 
         flow1.send(1)
         advanceUntilIdle()
-        assertThat(result).isEmpty()
+        assertTrue(result.isEmpty())
 
         flow1.send(1)
         advanceUntilIdle()
-        assertThat(result).isEmpty()
+        assertTrue(result.isEmpty())
 
         flow2.send(2)
         advanceUntilIdle()
@@ -324,7 +327,7 @@ class FlowExtTest {
             advanceUntilIdle()
             assertFalse(job.isCompleted)
             // No events should be received until we receive an event from the other Flow.
-            assertThat(result).isEmpty()
+            assertTrue(result.isEmpty())
 
             combiner.onNext(index = 1, value = 0)
 
@@ -363,7 +366,7 @@ class FlowExtTest {
             advanceUntilIdle()
             assertFalse(job.isCompleted)
             // No events should be received until we receive an event from the other Flow.
-            assertThat(result).isEmpty()
+            assertTrue(result.isEmpty())
 
             combiner.onNext(index = 0, value = 0)
 

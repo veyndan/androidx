@@ -249,7 +249,7 @@ class PagingDataDifferTest(
                 source = loadStates(prepend = NotLoading.Complete)
             )
         )
-        assertThat(receiver.hints).isEmpty()
+        assertTrue(receiver.hints.isEmpty())
 
         // This index points to a valid placeholder that ends up removed by filter().
         assertNull(differ[5])
@@ -297,7 +297,7 @@ class PagingDataDifferTest(
                 source = loadStates(prepend = NotLoading.Complete, append = NotLoading.Complete)
             )
         )
-        assertThat(receiver.hints).isEmpty()
+        assertTrue(receiver.hints.isEmpty())
 
         job.cancel()
     }
@@ -708,7 +708,7 @@ class PagingDataDifferTest(
                 combinedLoadStates.add(it)
             }
         }
-        assertThat(combinedLoadStates).isEmpty()
+        assertTrue(combinedLoadStates.isEmpty())
 
         // Add a real value and now we should emit to collector.
         differ.collectFrom(
@@ -755,11 +755,11 @@ class PagingDataDifferTest(
                 combinedLoadStates.add(it)
             }
         }
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
 
         // Send a static list without load states, which should not send anything.
         differ.collectFrom(PagingData.empty())
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
 
         // Send a real LoadStateUpdate.
         differ.collectFrom(
@@ -794,7 +794,7 @@ class PagingDataDifferTest(
         // Send a static list without load states, which should preserve the previous state.
         differ.collectFrom(PagingData.empty())
         // Existing observers should not receive any updates
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
         // New observers should receive the previous state.
         val newCombinedLoadStates = mutableListOf<CombinedLoadStates>()
         val newLoadStateJob = launch {
@@ -831,11 +831,11 @@ class PagingDataDifferTest(
                 combinedLoadStates.add(it)
             }
         }
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
 
         // Send a static list without load states, which should not send anything.
         differ.collectFrom(PagingData.from(listOf(1)))
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
 
         // Send a real LoadStateUpdate.
         differ.collectFrom(
@@ -870,7 +870,7 @@ class PagingDataDifferTest(
         // Send a static list without load states, which should preserve the previous state.
         differ.collectFrom(PagingData.from(listOf(1)))
         // Existing observers should not receive any updates
-        assertThat(combinedLoadStates.getAllAndClear()).isEmpty()
+        assertTrue(combinedLoadStates.getAllAndClear().isEmpty())
         // New observers should receive the previous state.
         val newCombinedLoadStates = mutableListOf<CombinedLoadStates>()
         val newLoadStateJob = launch {
@@ -951,7 +951,7 @@ class PagingDataDifferTest(
 
         // Adding a new listener without a real value should not trigger it.
         differ.addLoadStateListener(combinedLoadStateCapture)
-        assertThat(combinedLoadStateCapture.newEvents()).isEmpty()
+        assertTrue(combinedLoadStateCapture.newEvents().isEmpty())
 
         // Add a real value and now the listener should trigger.
         differ.collectFrom(
@@ -1236,7 +1236,7 @@ class PagingDataDifferTest(
         pagingSources[0].nextLoadResult = LoadResult.Invalid()
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.snapshot()).isEmpty()
+        assertTrue(differ.snapshot().isEmpty())
         assertThat(differ.newCombinedLoadStates()).containsExactly(
             // invalid first refresh. The second refresh state update that follows is identical to
             // this LoadStates so it gets de-duped
@@ -1364,7 +1364,7 @@ class PagingDataDifferTest(
             localLoadStatesOf(refreshLocal = Loading),
             localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
         )
-        assertThat(differ.snapshot()).isEmpty()
+        assertTrue(differ.snapshot().isEmpty())
 
         // retry refresh
         differ.retry()
@@ -1440,7 +1440,7 @@ class PagingDataDifferTest(
             localLoadStatesOf(refreshLocal = Loading),
             localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
         )
-        assertThat(differ.snapshot()).isEmpty()
+        assertTrue(differ.snapshot().isEmpty())
 
         // refresh should trigger new generation
         differ.refresh()

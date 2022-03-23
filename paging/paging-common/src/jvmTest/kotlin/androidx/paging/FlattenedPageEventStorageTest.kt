@@ -26,6 +26,7 @@ import androidx.paging.PageEvent.Drop
 import androidx.paging.PageEvent.StaticList
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertTrue
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
@@ -36,7 +37,7 @@ class FlattenedPageEventStorageTest {
     @Test
     fun empty() {
         assertThat(list.snapshot()).isEqualTo(Snapshot<String>())
-        assertThat(list.getAsEvents()).isEmpty()
+        assertTrue(list.getAsEvents().isEmpty())
     }
 
     @Test

@@ -1011,7 +1011,7 @@ class PageFetcherTest {
             assertThat(pagingSources.size).isEqualTo(3)
 
             // First generation should use initialKey.
-            assertThat(pagingSources[0].getRefreshKeyCalls).isEmpty()
+            assertTrue(pagingSources[0].getRefreshKeyCalls.isEmpty())
 
             // Second generation should receive getRefreshKey call with state from first generation.
             assertThat(pagingSources[1].getRefreshKeyCalls).isEqualTo(
@@ -1026,7 +1026,7 @@ class PageFetcherTest {
             )
 
             // Verify second generation was invalidated before any pages loaded.
-            assertThat(pagingSources[1].loadedPages).isEmpty()
+            assertTrue(pagingSources[1].loadedPages.isEmpty())
 
             // Third generation should receive getRefreshKey call with state from first generation.
             assertThat(pagingSources[0].loadedPages.size).isEqualTo(1)

@@ -21,6 +21,7 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.LoadType.REFRESH
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -211,8 +212,8 @@ class HintHandlerTest {
             hintHandler.hintFor(APPEND)
         )
         runCurrent()
-        assertThat(prependHints.values).isEmpty()
-        assertThat(appendHints.values).isEmpty()
+        assertTrue(prependHints.values.isEmpty())
+        assertTrue(appendHints.values.isEmpty())
         hintHandler.processHint(hint)
         runCurrent()
         assertThat(prependHints.values).containsExactly(hint)

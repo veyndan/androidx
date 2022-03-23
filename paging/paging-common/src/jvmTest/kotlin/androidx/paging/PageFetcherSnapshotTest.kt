@@ -1486,7 +1486,7 @@ class PageFetcherSnapshotTest {
                     )
                 )
                 advanceUntilIdle()
-                assertThat(pageEvents.newEvents()).isEmpty()
+                assertTrue(pageEvents.newEvents().isEmpty())
 
                 // Hint to trigger PREPEND
                 pager.accessHint(
@@ -1546,7 +1546,7 @@ class PageFetcherSnapshotTest {
                     )
                 )
                 advanceUntilIdle()
-                assertThat(pageEvents.newEvents()).isEmpty()
+                assertTrue(pageEvents.newEvents().isEmpty())
             }
 
             testScope.advanceUntilIdle()
@@ -3561,7 +3561,7 @@ class PageFetcherSnapshotTest {
                 localLoadStateUpdate<Int>(refreshLocal = Loading),
             )
             // make sure no more new events are sent to UI
-            assertThat(state.newEvents()).isEmpty()
+            assertTrue(state.newEvents().isEmpty())
             assertTrue(pagingSource.invalid)
             assertTrue { !job.isActive }
         }
@@ -3601,7 +3601,7 @@ class PageFetcherSnapshotTest {
                 localLoadStateUpdate<Int>(appendLocal = Loading),
             )
             assertTrue(pagingSource.invalid)
-            assertThat(state.newEvents()).isEmpty()
+            assertTrue(state.newEvents().isEmpty())
             assertThat(!job.isActive)
         }
     }
@@ -3640,7 +3640,7 @@ class PageFetcherSnapshotTest {
                 localLoadStateUpdate<Int>(prependLocal = Loading),
             )
             assertTrue(pagingSource.invalid)
-            assertThat(state.newEvents()).isEmpty()
+            assertTrue(state.newEvents().isEmpty())
             assertThat(!job.isActive)
         }
     }

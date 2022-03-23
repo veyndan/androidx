@@ -72,7 +72,7 @@ class CachedPageEventFlowTest(
         assertThat(fastCollector.items()).containsExactly(
             refreshEvent
         )
-        assertThat(slowCollector.items()).isEmpty()
+        assertTrue(slowCollector.items().isEmpty())
 
         val appendEvent = localAppend(
             listOf(
@@ -87,7 +87,7 @@ class CachedPageEventFlowTest(
             refreshEvent,
             appendEvent
         )
-        assertThat(slowCollector.items()).isEmpty()
+        assertTrue(slowCollector.items().isEmpty())
         advanceTimeBy(3_000)
         assertThat(slowCollector.items()).containsExactly(
             refreshEvent,
@@ -267,8 +267,8 @@ class CachedPageEventFlowTest(
         runCurrent()
 
         // until upstream sends events, collectors shouldn't receive any events
-        assertThat(collector.items()).isEmpty()
-        assertThat(collector2.items()).isEmpty()
+        assertTrue(collector.items().isEmpty())
+        assertTrue(collector2.items().isEmpty())
 
         // now send refresh event
         val refreshEvent = localRefresh(

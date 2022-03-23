@@ -18,6 +18,7 @@ package androidx.paging
 
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -35,9 +36,7 @@ class ConflatedEventBusTest {
             it.start()
         }
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).isEmpty()
+        assertTrue(collector.values.isEmpty())
         bus.send(Unit)
         testScope.runCurrent()
         assertThat(
