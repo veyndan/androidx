@@ -22,6 +22,8 @@ import androidx.paging.CombineSource.RECEIVER
 import com.google.common.truth.Truth.assertThat
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
@@ -320,14 +322,14 @@ class FlowExtTest {
             // Ensure subsequent calls to onNext from receiver suspends forever until onNext
             // is called for the other Flow.
             advanceUntilIdle()
-            assertThat(job.isCompleted).isFalse()
+            assertFalse(job.isCompleted)
             // No events should be received until we receive an event from the other Flow.
             assertThat(result).isEmpty()
 
             combiner.onNext(index = 1, value = 0)
 
             advanceUntilIdle()
-            assertThat(job.isCompleted).isTrue()
+            assertTrue(job.isCompleted)
             assertThat(result).containsExactly(
                 SendResult(0, 0, INITIAL),
                 SendResult(1, 0, RECEIVER),
@@ -359,14 +361,14 @@ class FlowExtTest {
             // Ensure subsequent calls to onNext from receiver suspends forever until onNext
             // is called for the other Flow.
             advanceUntilIdle()
-            assertThat(job.isCompleted).isFalse()
+            assertFalse(job.isCompleted)
             // No events should be received until we receive an event from the other Flow.
             assertThat(result).isEmpty()
 
             combiner.onNext(index = 0, value = 0)
 
             advanceUntilIdle()
-            assertThat(job.isCompleted).isTrue()
+            assertTrue(job.isCompleted)
             assertThat(result).containsExactly(
                 SendResult(0, 0, INITIAL),
                 SendResult(0, 1, OTHER),

@@ -28,6 +28,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineDispatcher
@@ -738,14 +739,14 @@ class PageFetcherTest {
         // not finish initial page load.
         runCurrent()
         assertThat(pagingSources).hasSize(2)
-        assertThat(pagingSources[0].invalid).isTrue()
+        assertTrue(pagingSources[0].invalid)
         assertThat(loadedPages).hasSize(0)
 
         advanceUntilIdle()
 
         // After draining tasks, we should immediately get a second generation which triggers
         // page load, skipping the initial load from first generation due to cancellation.
-        assertThat(pagingSources[1].invalid).isFalse()
+        assertFalse(pagingSources[1].invalid)
         assertThat(loadedPages).hasSize(1)
 
         job.cancel()

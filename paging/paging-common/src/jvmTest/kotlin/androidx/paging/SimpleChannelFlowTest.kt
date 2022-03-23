@@ -19,6 +19,7 @@ package androidx.paging
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CancellationException
 import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -131,7 +132,7 @@ class SimpleChannelFlowTest(
                 }
             }
             awaitClose {
-                assertThat(lastDispatched.isActive).isTrue()
+                assertTrue(lastDispatched.isActive)
                 lastDispatched.complete(dispatched)
             }
         }

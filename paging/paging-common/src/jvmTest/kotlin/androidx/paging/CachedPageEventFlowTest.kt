@@ -18,6 +18,8 @@ package androidx.paging
 
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -123,12 +125,12 @@ class CachedPageEventFlowTest(
         ) + manyNewAppendEvents + finalAppendEvent
         runCurrent()
         assertThat(fastCollector.items()).containsExactlyElementsIn(fullList).inOrder()
-        assertThat(fastCollector.isActive()).isFalse()
-        assertThat(slowCollector.isActive()).isTrue()
-        assertThat(lateSlowCollector.isActive()).isTrue()
+        assertFalse(fastCollector.isActive())
+        assertTrue(slowCollector.isActive())
+        assertTrue(lateSlowCollector.isActive())
         advanceUntilIdle()
         assertThat(slowCollector.items()).containsExactlyElementsIn(fullList).inOrder()
-        assertThat(slowCollector.isActive()).isFalse()
+        assertFalse(slowCollector.isActive())
 
         val lateCollectorState = localRefresh(
             pages = (listOf(refreshEvent, appendEvent) + manyNewAppendEvents).flatMap {
@@ -138,7 +140,7 @@ class CachedPageEventFlowTest(
         assertThat(lateSlowCollector.items()).containsExactly(
             lateCollectorState, finalAppendEvent
         ).inOrder()
-        assertThat(lateSlowCollector.isActive()).isFalse()
+        assertFalse(lateSlowCollector.isActive())
 
         upstream.close()
     }
@@ -225,23 +227,23 @@ class CachedPageEventFlowTest(
         assertThat(collector3.items()).containsExactly(
             finalState
         )
-        assertThat(collector1.isActive()).isTrue()
-        assertThat(collector2.isActive()).isTrue()
-        assertThat(collector3.isActive()).isTrue()
+        assertTrue(collector1.isActive())
+        assertTrue(collector2.isActive())
+        assertTrue(collector3.isActive())
         when (terminationType) {
             TerminationType.CLOSE_UPSTREAM -> upstream.close()
             TerminationType.CLOSE_CACHED_EVENT_FLOW -> subject.close()
         }
         runCurrent()
-        assertThat(collector1.isActive()).isFalse()
-        assertThat(collector2.isActive()).isFalse()
-        assertThat(collector3.isActive()).isFalse()
+        assertFalse(collector1.isActive())
+        assertFalse(collector2.isActive())
+        assertFalse(collector3.isActive())
         val collector4 = PageCollector(subject.downstreamFlow).also {
             it.collectIn(testScope)
         }
         runCurrent()
         // since upstream is closed, this should just close
-        assertThat(collector4.isActive()).isFalse()
+        assertFalse(collector4.isActive())
         assertThat(collector4.items()).containsExactly(
             finalState
         )
