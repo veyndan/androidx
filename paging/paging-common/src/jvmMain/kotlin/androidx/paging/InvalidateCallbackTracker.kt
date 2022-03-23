@@ -16,7 +16,6 @@
 
 package androidx.paging
 
-import androidx.annotation.VisibleForTesting
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -35,7 +34,6 @@ internal class InvalidateCallbackTracker<T>(
     internal var invalid = false
         private set
 
-    @VisibleForTesting
     internal fun callbackCount() = callbacks.size
 
     internal fun registerInvalidatedCallback(callback: T) {

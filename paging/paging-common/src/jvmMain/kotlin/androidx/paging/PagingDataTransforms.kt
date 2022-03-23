@@ -18,7 +18,6 @@
 
 package androidx.paging
 
-import androidx.annotation.CheckResult
 import androidx.paging.TerminalSeparatorType.FULLY_COMPLETE
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.map
@@ -36,7 +35,6 @@ private inline fun <T : Any, R : Any> PagingData<T>.transform(
  * Returns a [PagingData] containing the result of applying the given [transform] to each
  * element, as it is loaded.
  */
-@CheckResult
 @JvmSynthetic
 public fun <T : Any, R : Any> PagingData<T>.map(
     transform: suspend (T) -> R
@@ -48,7 +46,6 @@ public fun <T : Any, R : Any> PagingData<T>.map(
  *
  * @see PagingData.map
  */
-@CheckResult
 public fun <T : Any, R : Any> PagingData<T>.map(
     executor: Executor,
     transform: (T) -> R,
@@ -62,7 +59,6 @@ public fun <T : Any, R : Any> PagingData<T>.map(
  * Returns a [PagingData] of all elements returned from applying the given [transform]
  * to each element, as it is loaded.
  */
-@CheckResult
 @JvmSynthetic
 public fun <T : Any, R : Any> PagingData<T>.flatMap(
     transform: suspend (T) -> Iterable<R>
@@ -74,7 +70,6 @@ public fun <T : Any, R : Any> PagingData<T>.flatMap(
  *
  * @see flatMap
  */
-@CheckResult
 public fun <T : Any, R : Any> PagingData<T>.flatMap(
     executor: Executor,
     transform: (T) -> Iterable<R>
@@ -87,7 +82,6 @@ public fun <T : Any, R : Any> PagingData<T>.flatMap(
 /**
  * Returns a [PagingData] containing only elements matching the given [predicate]
  */
-@CheckResult
 @JvmSynthetic
 public fun <T : Any> PagingData<T>.filter(
     predicate: suspend (T) -> Boolean
@@ -98,7 +92,6 @@ public fun <T : Any> PagingData<T>.filter(
  *
  * @see filter
  */
-@CheckResult
 @JvmName("filter")
 public fun <T : Any> PagingData<T>.filter(
     executor: Executor,
@@ -128,7 +121,6 @@ public fun <T : Any> PagingData<T>.filter(
  * @sample androidx.paging.samples.insertSeparatorsSample
  * @sample androidx.paging.samples.insertSeparatorsUiModelSample
  */
-@CheckResult
 @JvmSynthetic
 public fun <T : R, R : Any> PagingData<T>.insertSeparators(
     terminalSeparatorType: TerminalSeparatorType = FULLY_COMPLETE,
@@ -250,7 +242,6 @@ public fun <T : R, R : Any> PagingData<T>.insertSeparators(
  * list is empty, a single separator will be added where both `before` and `after` items are `null`.
  *
  */
-@CheckResult
 @JvmOverloads
 public fun <R : Any, T : R> PagingData<T>.insertSeparators(
     terminalSeparatorType: TerminalSeparatorType = FULLY_COMPLETE,
@@ -285,7 +276,6 @@ public fun <R : Any, T : R> PagingData<T>.insertSeparators(
  *
  * @see [insertFooterItem]
  */
-@CheckResult
 @JvmOverloads
 public fun <T : Any> PagingData<T>.insertHeaderItem(
     terminalSeparatorType: TerminalSeparatorType = FULLY_COMPLETE,
@@ -315,7 +305,6 @@ public fun <T : Any> PagingData<T>.insertHeaderItem(
  *
  * @see [insertHeaderItem]
  */
-@CheckResult
 @JvmOverloads
 public fun <T : Any> PagingData<T>.insertFooterItem(
     terminalSeparatorType: TerminalSeparatorType = FULLY_COMPLETE,
