@@ -41,7 +41,7 @@ public class PagingState<Key : Any, Value : Any> constructor(
     /**
      * Number of placeholders before the first loaded item if placeholders are enabled, otherwise 0.
      */
-    private val leadingPlaceholderCount: Int
+    val leadingPlaceholderCount: Int
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -133,7 +133,7 @@ public class PagingState<Key : Any, Value : Any> constructor(
             "leadingPlaceholderCount=$leadingPlaceholderCount)"
     }
 
-    internal inline fun <T> anchorPositionToPagedIndices(
+    inline fun <T> anchorPositionToPagedIndices(
         anchorPosition: Int,
         block: (pageIndex: Int, index: Int) -> T
     ): T {

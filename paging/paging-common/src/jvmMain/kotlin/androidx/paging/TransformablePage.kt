@@ -16,7 +16,7 @@
 
 package androidx.paging
 
-internal data class TransformablePage<T : Any>(
+data class TransformablePage<T : Any>(
     /**
      * List of original (pre-transformation) page offsets the original page relative to initial = 0,
      * that this [TransformablePage] depends on.

@@ -39,15 +39,15 @@ import kotlinx.coroutines.sync.withLock
  *
  * Note: This class is not thread-safe and must be guarded by a lock!
  */
-internal class PageFetcherSnapshotState<Key : Any, Value : Any> private constructor(
+class PageFetcherSnapshotState<Key : Any, Value : Any> private constructor(
     private val config: PagingConfig
 ) {
     private val _pages = mutableListOf<Page<Key, Value>>()
-    internal val pages: List<Page<Key, Value>> = _pages
-    internal var initialPageIndex = 0
+    val pages: List<Page<Key, Value>> = _pages
+    var initialPageIndex = 0
         private set
 
-    internal val storageCount
+    val storageCount
         get() = pages.sumOf { it.data.size }
 
     private var _placeholdersBefore = 0
@@ -55,7 +55,7 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
     /**
      * Always greater than or equal to 0.
      */
-    internal var placeholdersBefore
+    var placeholdersBefore
         get() = when {
             config.enablePlaceholders -> _placeholdersBefore
             else -> 0
@@ -72,7 +72,7 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
     /**
      * Always greater than or equal to 0.
      */
-    internal var placeholdersAfter
+    var placeholdersAfter
         get() = when {
             config.enablePlaceholders -> _placeholdersAfter
             else -> 0
@@ -91,7 +91,7 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
     private val prependGenerationIdCh = Channel<Int>(Channel.CONFLATED)
     private val appendGenerationIdCh = Channel<Int>(Channel.CONFLATED)
 
-    internal fun generationId(loadType: LoadType): Int = when (loadType) {
+    fun generationId(loadType: LoadType): Int = when (loadType) {
         REFRESH -> throw IllegalArgumentException("Cannot get loadId for loadType: REFRESH")
         PREPEND -> prependGenerationId
         APPEND -> appendGenerationId
@@ -102,11 +102,11 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
      * we can later retry. This is so we always trigger loads based on hints, instead of having
      * two different ways to trigger.
      */
-    internal val failedHintsByLoadType = mutableMapOf<LoadType, ViewportHint>()
+    val failedHintsByLoadType = mutableMapOf<LoadType, ViewportHint>()
 
     // Only track the local load states, remote states are injected from PageFetcher. This class
     // only tracks state within a single generation from source side.
-    internal var sourceLoadStates = MutableLoadStateCollection().apply {
+    var sourceLoadStates = MutableLoadStateCollection().apply {
         // Synchronously initialize REFRESH with Loading.
         // NOTE: It is important that we do this synchronously on init, since PageFetcherSnapshot
         // expects to send this initial state immediately. It is always correct for a new
@@ -135,7 +135,7 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
      * TODO: Move this into Pager, which owns pageEventCh, since this logic is sensitive to its
      *  implementation.
      */
-    internal fun Page<Key, Value>.toPageEvent(loadType: LoadType): PageEvent<Value> {
+    fun Page<Key, Value>.toPageEvent(loadType: LoadType): PageEvent<Value> {
         val sourcePageIndex = when (loadType) {
             REFRESH -> 0
             PREPEND -> 0 - initialPageIndex
@@ -314,7 +314,7 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
         }
     }
 
-    internal fun currentPagingState(viewportHint: ViewportHint.Access?) = PagingState<Key, Value>(
+    fun currentPagingState(viewportHint: ViewportHint.Access?) = PagingState<Key, Value>(
         pages = pages.toList(),
         anchorPosition = viewportHint?.let { hint ->
             // Translate viewportHint to anchorPosition based on fetcher state (pre-transformation),
@@ -377,11 +377,11 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
      * race scenarios.
      */
     @Suppress("SyntheticAccessor")
-    internal class Holder<Key : Any, Value : Any>(
+    class Holder<Key : Any, Value : Any>(
         private val config: PagingConfig
     ) {
-        private val lock = Mutex()
-        private val state = PageFetcherSnapshotState<Key, Value>(config)
+        val lock = Mutex()
+        val state = PageFetcherSnapshotState<Key, Value>(config)
 
         suspend inline fun <T> withLock(
             block: (state: PageFetcherSnapshotState<Key, Value>) -> T

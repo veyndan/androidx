@@ -16,4 +16,4 @@
 
 package androidx.paging.internal
 
-internal const val BUGANIZER_URL = "https://issuetracker.google.com/issues/new?component=413106"
+const val BUGANIZER_URL = "https://issuetracker.google.com/issues/new?component=413106"

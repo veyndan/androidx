@@ -22,7 +22,7 @@ import kotlin.concurrent.withLock
 /**
  * Helper class for thread-safe invalidation callback tracking + triggering on registration.
  */
-internal class InvalidateCallbackTracker<T>(
+class InvalidateCallbackTracker<T>(
     private val callbackInvoker: (T) -> Unit,
     /**
      * User-provided override of DataSource.isInvalid
@@ -31,12 +31,12 @@ internal class InvalidateCallbackTracker<T>(
 ) {
     private val lock = ReentrantLock()
     private val callbacks = mutableListOf<T>()
-    internal var invalid = false
+    var invalid = false
         private set
 
-    internal fun callbackCount() = callbacks.size
+    fun callbackCount() = callbacks.size
 
-    internal fun registerInvalidatedCallback(callback: T) {
+    fun registerInvalidatedCallback(callback: T) {
         // This isn't sufficient, but is the best we can do in cases where DataSource.isInvalid
         // is overridden, since we have no way of knowing when the result gets flipped if user
         // never calls .invalidate().
@@ -63,13 +63,13 @@ internal class InvalidateCallbackTracker<T>(
         }
     }
 
-    internal fun unregisterInvalidatedCallback(callback: T) {
+    fun unregisterInvalidatedCallback(callback: T) {
         lock.withLock {
             callbacks.remove(callback)
         }
     }
 
-    internal fun invalidate() {
+    fun invalidate() {
         if (invalid) return
 
         var callbacksToInvoke: List<T>?

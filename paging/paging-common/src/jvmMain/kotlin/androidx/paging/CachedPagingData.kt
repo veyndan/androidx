@@ -84,7 +84,7 @@ public fun <T : Any> Flow<PagingData<T>>.cachedIn(
     scope: CoroutineScope
 ): Flow<PagingData<T>> = cachedIn(scope, null)
 
-internal fun <T : Any> Flow<PagingData<T>>.cachedIn(
+fun <T : Any> Flow<PagingData<T>>.cachedIn(
     scope: CoroutineScope,
     // used in tests
     tracker: ActiveFlowTracker? = null
@@ -115,7 +115,7 @@ internal fun <T : Any> Flow<PagingData<T>>.cachedIn(
 /**
  * This is only used for testing to ensure we don't leak resources
  */
-internal interface ActiveFlowTracker {
+interface ActiveFlowTracker {
     fun onNewCachedEventFlow(cachedPageEventFlow: CachedPageEventFlow<*>)
     suspend fun onStart(flowType: FlowType)
     suspend fun onComplete(flowType: FlowType)

@@ -39,7 +39,7 @@ import kotlin.coroutines.resume
  * where the default is buffered and any followup buffer operation will result in +1 value being
  * produced.
  */
-internal fun <T> simpleChannelFlow(
+fun <T> simpleChannelFlow(
     block: suspend SimpleProducerScope<T>.() -> Unit
 ): Flow<T> {
     return flow {
@@ -70,12 +70,12 @@ internal fun <T> simpleChannelFlow(
     }.buffer(Channel.BUFFERED)
 }
 
-internal interface SimpleProducerScope<T> : CoroutineScope, SendChannel<T> {
+interface SimpleProducerScope<T> : CoroutineScope, SendChannel<T> {
     val channel: SendChannel<T>
     suspend fun awaitClose(block: () -> Unit)
 }
 
-internal class SimpleProducerScopeImpl<T>(
+class SimpleProducerScopeImpl<T>(
     scope: CoroutineScope,
     override val channel: SendChannel<T>,
 ) : SimpleProducerScope<T>, CoroutineScope by scope, SendChannel<T> by channel {

@@ -25,12 +25,12 @@ import kotlinx.coroutines.flow.flowOf
  * Each refresh of data (generally either pushed by local storage, or pulled from the network)
  * will have a separate corresponding [PagingData].
  */
-public class PagingData<T : Any> internal constructor(
-    internal val flow: Flow<PageEvent<T>>,
-    internal val receiver: UiReceiver
+public class PagingData<T : Any> constructor(
+    val flow: Flow<PageEvent<T>>,
+    val receiver: UiReceiver
 ) {
     public companion object {
-        internal val NOOP_RECEIVER = object : UiReceiver {
+        val NOOP_RECEIVER = object : UiReceiver {
             override fun accessHint(viewportHint: ViewportHint) {}
 
             override fun retry() {}

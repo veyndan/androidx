@@ -29,7 +29,7 @@ import kotlin.concurrent.withLock
  * It processes incoming hints and keeps a min/max (prepend/append) values and provides them as a
  * flow to [PageFetcherSnapshot].
  */
-internal class HintHandler {
+class HintHandler {
     private val state = State()
 
     /**
@@ -142,7 +142,7 @@ internal class HintHandler {
     }
 }
 
-internal fun ViewportHint.shouldPrioritizeOver(
+fun ViewportHint.shouldPrioritizeOver(
     previous: ViewportHint?,
     loadType: LoadType
 ): Boolean {

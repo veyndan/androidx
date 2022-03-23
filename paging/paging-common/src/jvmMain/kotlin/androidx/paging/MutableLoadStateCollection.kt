@@ -18,7 +18,7 @@ package androidx.paging
 
 import androidx.paging.LoadState.NotLoading
 
-internal class MutableLoadStateCollection {
+class MutableLoadStateCollection {
     var refresh: LoadState = NotLoading.Incomplete
     var prepend: LoadState = NotLoading.Incomplete
     var append: LoadState = NotLoading.Incomplete

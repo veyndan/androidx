@@ -21,7 +21,7 @@ import androidx.paging.PagingSource.LoadResult.Page
 /**
  * Load access information blob, containing information from presenter.
  */
-internal sealed class ViewportHint(
+sealed class ViewportHint(
     /**
      * Distance from hint to first loaded item: `anchorPosition - firstLoadedItemPosition`
      *
@@ -68,7 +68,7 @@ internal sealed class ViewportHint(
      *  * the beginning of the list if [loadType] == PREPEND
      *  * the end of the list if loadType == APPEND
      */
-    internal fun presentedItemsBeyondAnchor(loadType: LoadType): Int = when (loadType) {
+    fun presentedItemsBeyondAnchor(loadType: LoadType): Int = when (loadType) {
         LoadType.REFRESH -> throw IllegalArgumentException(
             "Cannot get presentedItems for loadType: REFRESH"
         )

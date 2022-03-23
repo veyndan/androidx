@@ -36,7 +36,7 @@ import kotlinx.coroutines.sync.withLock
  *
  * Note: When a block is cancelled, the outer scope (which called runInIsolation) is NOT cancelled.
  */
-internal class SingleRunner(
+class SingleRunner(
     cancelPreviousInEqualPriority: Boolean = true
 ) {
     private val holder = Holder(this, cancelPreviousInEqualPriority)

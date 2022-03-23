@@ -50,9 +50,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  * of [PageFetcherSnapshot] and its corresponding [PageFetcherSnapshotState] should be launched
  * within a scope that is cancelled when [PagingSource.invalidate] is called.
  */
-internal class PageFetcherSnapshot<Key : Any, Value : Any>(
-    internal val initialKey: Key?,
-    internal val pagingSource: PagingSource<Key, Value>,
+class PageFetcherSnapshot<Key : Any, Value : Any>(
+    val initialKey: Key?,
+    val pagingSource: PagingSource<Key, Value>,
     private val config: PagingConfig,
     private val retryFlow: Flow<Unit>,
     val remoteMediatorConnection: RemoteMediatorConnection<Key, Value>? = null,
@@ -576,7 +576,7 @@ internal class PageFetcherSnapshot<Key : Any, Value : Any>(
  * Generation of cancel token not [PageFetcherSnapshot]. [generationId] is used to differentiate
  * between loads from jobs that have been cancelled, but continued to run to completion.
  */
-internal data class GenerationalViewportHint(val generationId: Int, val hint: ViewportHint)
+data class GenerationalViewportHint(val generationId: Int, val hint: ViewportHint)
 
 /**
  * Helper for [GenerationalViewportHint] prioritization in cases where item accesses are being sent
@@ -589,7 +589,7 @@ internal data class GenerationalViewportHint(val generationId: Int, val hint: Vi
  *
  * @return `true` if [this] [GenerationalViewportHint] should be prioritized over [previous].
  */
-internal fun GenerationalViewportHint.shouldPrioritizeOver(
+fun GenerationalViewportHint.shouldPrioritizeOver(
     previous: GenerationalViewportHint,
     loadType: LoadType
 ): Boolean {

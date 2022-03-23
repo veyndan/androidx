@@ -30,7 +30,7 @@ import kotlin.concurrent.withLock
 /**
  * Interface provided to the snapshot to trigger load events.
  */
-internal interface RemoteMediatorConnection<Key : Any, Value : Any> {
+interface RemoteMediatorConnection<Key : Any, Value : Any> {
     fun requestRefreshIfAllowed(
         pagingState: PagingState<Key, Value>
     )
@@ -49,7 +49,7 @@ internal interface RemoteMediatorConnection<Key : Any, Value : Any> {
 }
 
 @OptIn(ExperimentalPagingApi::class)
-internal interface RemoteMediatorAccessor<Key : Any, Value : Any> :
+interface RemoteMediatorAccessor<Key : Any, Value : Any> :
     RemoteMediatorConnection<Key, Value> {
     val state: StateFlow<LoadStates>
 
@@ -58,7 +58,7 @@ internal interface RemoteMediatorAccessor<Key : Any, Value : Any> :
 
 @Suppress("FunctionName")
 @OptIn(ExperimentalPagingApi::class)
-internal fun <Key : Any, Value : Any> RemoteMediatorAccessor(
+fun <Key : Any, Value : Any> RemoteMediatorAccessor(
     scope: CoroutineScope,
     delegate: RemoteMediator<Key, Value>
 ): RemoteMediatorAccessor<Key, Value> = RemoteMediatorAccessImpl(scope, delegate)

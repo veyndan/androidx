@@ -70,7 +70,7 @@ public abstract class PagingSource<Key : Any, Value : Any> {
         callbackInvoker = { it() }
     )
 
-    internal val invalidateCallbackCount: Int
+    val invalidateCallbackCount: Int
         get() = invalidateCallbackTracker.callbackCount()
 
     /**
@@ -147,7 +147,7 @@ public abstract class PagingSource<Key : Any, Value : Any> {
             placeholdersEnabled = placeholdersEnabled,
         )
 
-        internal companion object {
+        companion object {
             fun <Key : Any> create(
                 loadType: LoadType,
                 key: Key?,
@@ -271,10 +271,10 @@ public abstract class PagingSource<Key : Any, Value : Any> {
                 public const val COUNT_UNDEFINED: Int = Int.MIN_VALUE
 
                 @Suppress("MemberVisibilityCanBePrivate") // Prevent synthetic accessor generation.
-                internal val EMPTY = Page(emptyList(), null, null, 0, 0)
+                val EMPTY = Page(emptyList(), null, null, 0, 0)
 
                 @Suppress("UNCHECKED_CAST") // Can safely ignore, since the list is empty.
-                internal fun <Key : Any, Value : Any> empty() = EMPTY as Page<Key, Value>
+                fun <Key : Any, Value : Any> empty() = EMPTY as Page<Key, Value>
             }
         }
     }

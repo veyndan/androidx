@@ -63,7 +63,7 @@ public enum class TerminalSeparatorType {
  *
  * Separators between pages are handled outside of the page, see `Flow<PageEvent>.insertSeparators`.
  */
-internal suspend fun <R : Any, T : R> TransformablePage<T>.insertInternalSeparators(
+suspend fun <R : Any, T : R> TransformablePage<T>.insertInternalSeparators(
     generator: suspend (T?, T?) -> R?
 ): TransformablePage<R> {
     if (data.isEmpty()) {
@@ -109,7 +109,7 @@ internal suspend fun <R : Any, T : R> TransformablePage<T>.insertInternalSeparat
 /**
  * Create a [TransformablePage] with the given separator (or empty, if the separator is null)
  */
-internal fun <T : Any> separatorPage(
+fun <T : Any> separatorPage(
     separator: T,
     originalPageOffsets: IntArray,
     hintOriginalPageOffset: Int,
@@ -127,7 +127,7 @@ internal fun <T : Any> separatorPage(
  * This is a helper to create separator pages that contain a single separator to be used to join
  * pages provided from stream.
  */
-internal fun <T : Any> MutableList<TransformablePage<T>>.addSeparatorPage(
+fun <T : Any> MutableList<TransformablePage<T>>.addSeparatorPage(
     separator: T?,
     originalPageOffsets: IntArray,
     hintOriginalPageOffset: Int,
@@ -150,7 +150,7 @@ internal fun <T : Any> MutableList<TransformablePage<T>>.addSeparatorPage(
  * This is a helper to create separator pages that contain a single separator to be used to join
  * pages provided from stream.
  */
-internal fun <R : Any, T : R> MutableList<TransformablePage<R>>.addSeparatorPage(
+fun <R : Any, T : R> MutableList<TransformablePage<R>>.addSeparatorPage(
     separator: R?,
     adjacentPageBefore: TransformablePage<T>?,
     adjacentPageAfter: TransformablePage<T>?,
@@ -596,7 +596,7 @@ private class SeparatorState<R : Any, T : R>(
  * This is intentionally not named insertSeparators to avoid creating a clashing import
  * with PagingData.insertSeparators, which is public
  */
-internal fun <T : R, R : Any> Flow<PageEvent<T>>.insertEventSeparators(
+fun <T : R, R : Any> Flow<PageEvent<T>>.insertEventSeparators(
     terminalSeparatorType: TerminalSeparatorType,
     generator: suspend (T?, T?) -> R?
 ): Flow<PageEvent<R>> {

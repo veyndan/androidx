@@ -100,7 +100,7 @@ public abstract class PagingDataDiffer<T : Any>(
         }
     }
 
-    internal fun dispatchLoadStates(source: LoadStates, mediator: LoadStates?) {
+    fun dispatchLoadStates(source: LoadStates, mediator: LoadStates?) {
         // No change, skip update + dispatch.
         if (combinedLoadStatesCollection.source == source &&
             combinedLoadStatesCollection.mediator == mediator

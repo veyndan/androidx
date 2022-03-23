@@ -97,7 +97,7 @@ public class CombinedLoadStates(
             "source=$source, mediator=$mediator)"
     }
 
-    internal fun forEach(op: (LoadType, Boolean, LoadState) -> Unit) {
+    fun forEach(op: (LoadType, Boolean, LoadState) -> Unit) {
         source.forEach { type, state ->
             op(type, false, state)
         }

@@ -35,7 +35,7 @@ import kotlinx.coroutines.sync.withLock
  * An intermediate flow producer that flattens previous page events and gives any new downstream
  * just those events instead of the full history.
  */
-internal class CachedPageEventFlow<T : Any>(
+class CachedPageEventFlow<T : Any>(
     src: Flow<PageEvent<T>>,
     scope: CoroutineScope
 ) {
@@ -148,7 +148,7 @@ private class FlattenedPageController<T : Any> {
  *
  * There is no synchronization in this code so it should be used with locks around if necessary.
  */
-internal class FlattenedPageEventStorage<T : Any> {
+class FlattenedPageEventStorage<T : Any> {
     private var placeholdersBefore: Int = 0
     private var placeholdersAfter: Int = 0
     private val pages = ArrayDeque<TransformablePage<T>>()

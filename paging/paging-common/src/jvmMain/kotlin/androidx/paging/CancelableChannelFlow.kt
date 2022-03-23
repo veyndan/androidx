@@ -19,7 +19,7 @@ package androidx.paging
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
-internal fun <T> cancelableChannelFlow(
+fun <T> cancelableChannelFlow(
     controller: Job,
     block: suspend SimpleProducerScope<T>.() -> Unit
 ): Flow<T> {

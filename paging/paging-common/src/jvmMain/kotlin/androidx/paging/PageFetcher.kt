@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 
-internal class PageFetcher<Key : Any, Value : Any>(
+class PageFetcher<Key : Any, Value : Any>(
     private val pagingSourceFactory: suspend () -> PagingSource<Key, Value>,
     private val initialKey: Key?,
     private val config: PagingConfig,
@@ -220,7 +220,7 @@ internal class PageFetcher<Key : Any, Value : Any>(
     }
 
     inner class PagerUiReceiver<Key : Any, Value : Any> constructor(
-        internal val pageFetcherSnapshot: PageFetcherSnapshot<Key, Value>,
+        val pageFetcherSnapshot: PageFetcherSnapshot<Key, Value>,
         private val retryEventBus: ConflatedEventBus<Unit>
     ) : UiReceiver {
         override fun accessHint(viewportHint: ViewportHint) {

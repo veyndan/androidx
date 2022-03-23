@@ -44,7 +44,7 @@ private val NULL = Any()
 /**
  * Temporary `scan` operator on Flow without experimental APIs.
  */
-internal fun <T, R> Flow<T>.simpleScan(
+fun <T, R> Flow<T>.simpleScan(
     initial: R,
     operation: suspend (accumulator: R, value: T) -> R
 ): Flow<R> = flow {
@@ -59,7 +59,7 @@ internal fun <T, R> Flow<T>.simpleScan(
 /**
  * Temporary `runningReduce` operator on Flow without experimental APIs.
  */
-internal fun <T> Flow<T>.simpleRunningReduce(
+fun <T> Flow<T>.simpleRunningReduce(
     operation: suspend (accumulator: T, value: T) -> T
 ): Flow<T> = flow {
     var accumulator: Any? = NULL
@@ -78,7 +78,7 @@ internal fun <T> Flow<T>.simpleRunningReduce(
 /**
  * This is a similar implementation to transformLatest using a channel Flow.
  */
-internal fun <T, R> Flow<T>.simpleTransformLatest(
+fun <T, R> Flow<T>.simpleTransformLatest(
     transform: suspend FlowCollector<R>.(value: T) -> Unit
 ): Flow<R> = simpleChannelFlow {
     val origin = this@simpleTransformLatest
@@ -91,18 +91,18 @@ internal fun <T, R> Flow<T>.simpleTransformLatest(
 /**
  * flatMapLatest without experimental APIs
  */
-internal inline fun <T, R> Flow<T>.simpleFlatMapLatest(
+inline fun <T, R> Flow<T>.simpleFlatMapLatest(
     crossinline transform: suspend (value: T) -> Flow<R>
 ): Flow<R> = simpleTransformLatest { emitAll(transform(it)) }
 
 /**
  * mapLatest without experimental APIs
  */
-internal inline fun <T, R> Flow<T>.simpleMapLatest(
+inline fun <T, R> Flow<T>.simpleMapLatest(
     crossinline transform: suspend (value: T) -> R
 ): Flow<R> = simpleTransformLatest { emit(transform(it)) }
 
-internal class ChannelFlowCollector<T>(
+class ChannelFlowCollector<T>(
     val channel: SendChannel<T>
 ) : FlowCollector<T> {
     override suspend fun emit(value: T) {
@@ -129,7 +129,7 @@ internal class ChannelFlowCollector<T>(
  *   * [RECEIVER]: Triggered by new emission from receiver
  *   * [OTHER]: Triggered by new emission from [otherFlow]
  */
-internal suspend inline fun <T1, T2, R> Flow<T1>.combineWithoutBatching(
+suspend inline fun <T1, T2, R> Flow<T1>.combineWithoutBatching(
     otherFlow: Flow<T2>,
     crossinline transform: suspend (T1, T2, updateFrom: CombineSource) -> R,
 ): Flow<R> {
@@ -170,7 +170,7 @@ internal suspend inline fun <T1, T2, R> Flow<T1>.combineWithoutBatching(
  *
  * @see combineWithoutBatching
  */
-internal class UnbatchedFlowCombiner<T1, T2>(
+class UnbatchedFlowCombiner<T1, T2>(
     private val send: suspend (t1: T1, t2: T2, updateFrom: CombineSource) -> Unit
 ) {
     private val initialDispatched = CompletableDeferred<Unit>()
@@ -214,7 +214,7 @@ internal class UnbatchedFlowCombiner<T1, T2>(
  *
  * @see combineWithoutBatching
  */
-internal enum class CombineSource {
+enum class CombineSource {
     INITIAL,
     RECEIVER,
     OTHER,

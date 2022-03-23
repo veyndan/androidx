@@ -32,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * with presenter APIs, which has the nuance of filtering out the initial value and dispatching to
  * listeners immediately as they get added.
  */
-internal class MutableCombinedLoadStateCollection {
+class MutableCombinedLoadStateCollection {
     /**
      * Tracks whether this [MutableCombinedLoadStateCollection] has been updated with real state
      * or has just been instantiated with its initial values.

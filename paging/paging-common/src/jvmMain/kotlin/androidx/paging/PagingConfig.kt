@@ -157,6 +157,6 @@ public class PagingConfig @JvmOverloads public constructor(
          */
         @Suppress("MinMaxConstant")
         public const val MAX_SIZE_UNBOUNDED: Int = Int.MAX_VALUE
-        internal const val DEFAULT_INITIAL_PAGE_MULTIPLIER = 3
+        const val DEFAULT_INITIAL_PAGE_MULTIPLIER = 3
     }
 }

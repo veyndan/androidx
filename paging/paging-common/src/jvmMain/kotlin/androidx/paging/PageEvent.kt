@@ -25,7 +25,7 @@ import androidx.paging.LoadType.REFRESH
  *
  * Every event sent to the UI is a PageEvent, and will be processed atomically.
  */
-internal sealed class PageEvent<T : Any> {
+sealed class PageEvent<T : Any> {
     /**
      * Represents a fully-terminal, static list of data.
      *
@@ -71,7 +71,7 @@ internal sealed class PageEvent<T : Any> {
 
     // Intentional to prefer Refresh, Prepend, Append constructors from Companion.
     @Suppress("DataClassPrivateConstructor")
-    data class Insert<T : Any> private constructor(
+    data class Insert<T : Any> constructor(
         val loadType: LoadType,
         val pages: List<TransformablePage<T>>,
         val placeholdersBefore: Int,
@@ -100,7 +100,7 @@ internal sealed class PageEvent<T : Any> {
             transform: (TransformablePage<T>) -> TransformablePage<R>
         ) = transformPages { it.map(transform) }
 
-        internal inline fun <R : Any> transformPages(
+        inline fun <R : Any> transformPages(
             transform: (List<TransformablePage<T>>) -> List<TransformablePage<R>>
         ): Insert<R> = Insert(
             loadType = loadType,

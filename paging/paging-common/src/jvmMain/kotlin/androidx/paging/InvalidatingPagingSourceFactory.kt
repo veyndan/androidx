@@ -33,7 +33,7 @@ public class InvalidatingPagingSourceFactory<Key : Any, Value : Any>(
     private val pagingSourceFactory: () -> PagingSource<Key, Value>
 ) : () -> PagingSource<Key, Value> {
 
-    internal val pagingSources = CopyOnWriteArrayList<PagingSource<Key, Value>>()
+    val pagingSources = CopyOnWriteArrayList<PagingSource<Key, Value>>()
 
     /**
      * @return [PagingSource] which will be invalidated when this factory's [invalidate] method
