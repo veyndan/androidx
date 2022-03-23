@@ -16,7 +16,7 @@
 
 package androidx.paging
 
-import java.util.concurrent.CopyOnWriteArrayList
+import co.touchlab.stately.collections.sharedMutableListOf
 
 /**
  * Wrapper class for a [PagingSource] factory intended for usage in [Pager] construction.
@@ -31,9 +31,9 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 public class InvalidatingPagingSourceFactory<Key : Any, Value : Any>(
     private val pagingSourceFactory: () -> PagingSource<Key, Value>
-) : () -> PagingSource<Key, Value> {
+) : PagingSourceFactory<Key, Value> {
 
-    val pagingSources = CopyOnWriteArrayList<PagingSource<Key, Value>>()
+    val pagingSources = sharedMutableListOf<PagingSource<Key, Value>>()
 
     /**
      * @return [PagingSource] which will be invalidated when this factory's [invalidate] method
@@ -48,11 +48,9 @@ public class InvalidatingPagingSourceFactory<Key : Any, Value : Any>(
      * [InvalidatingPagingSourceFactory]
      */
     public fun invalidate() {
-        for (pagingSource in pagingSources) {
-            if (!pagingSource.invalid) {
-                pagingSource.invalidate()
-            }
-        }
+        pagingSources
+            .filter { !it.invalid }
+            .forEach { it.invalidate() }
 
         pagingSources.removeAll { it.invalid }
     }

@@ -24,6 +24,7 @@ import androidx.paging.PageEvent.Insert
 import androidx.paging.PageEvent.StaticList
 import androidx.paging.PagePresenter.ProcessPageEventCallback
 import androidx.paging.internal.BUGANIZER_URL
+import co.touchlab.stately.collections.sharedMutableListOf
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -33,7 +34,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
-import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.jvm.Volatile
 
 /** @suppress */
 public abstract class PagingDataDiffer<T : Any>(
@@ -43,7 +44,7 @@ public abstract class PagingDataDiffer<T : Any>(
     private var presenter: PagePresenter<T> = PagePresenter.initial()
     private var receiver: UiReceiver? = null
     private val combinedLoadStatesCollection = MutableCombinedLoadStateCollection()
-    private val onPagesUpdatedListeners = CopyOnWriteArrayList<() -> Unit>()
+    private val onPagesUpdatedListeners = sharedMutableListOf<() -> Unit>()
 
     private val collectFromRunner = SingleRunner()
 

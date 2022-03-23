@@ -14,8 +14,11 @@
          <trust group="com.google.testing.platform"/> <!-- b/215430394 -->
          <trust group="com.google.android.gms"/> <!-- b/215442095 -->
          <trust group="org.nodejs"/>
+         <trust group="org.jetbrains.kotlinx"/>
+         <trust group="co.touchlab"/>
       </trusted-artifacts>
       <trusted-keys>
+         <trusted-key id="de453e55dc86fc9b" group="co.touchlab"/>
          <trusted-key id="4f77679369475baa" group="com.yarnpkg"/>
          <trusted-key id="00089ee8c3afa95a854d0f1df800dd0933ecf7f7" group="com.google.guava" name="guava"/>
          <trusted-key id="012579464d01c06a" group="org.apache"/>

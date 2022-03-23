@@ -20,12 +20,12 @@ import androidx.paging.AccessorState.BlockState.COMPLETED
 import androidx.paging.AccessorState.BlockState.REQUIRES_REFRESH
 import androidx.paging.AccessorState.BlockState.UNBLOCKED
 import androidx.paging.RemoteMediator.MediatorResult
+import co.touchlab.stately.concurrency.Lock
+import co.touchlab.stately.concurrency.withLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Interface provided to the snapshot to trigger load events.
@@ -67,7 +67,7 @@ fun <Key : Any, Value : Any> RemoteMediatorAccessor(
  * Simple wrapper around the local state of accessor to ensure we don't concurrently change it.
  */
 private class AccessorStateHolder<Key : Any, Value : Any> {
-    private val lock = ReentrantLock()
+    private val lock = Lock()
 
     private val _loadStates = MutableStateFlow(LoadStates.IDLE)
     val loadStates

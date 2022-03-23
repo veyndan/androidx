@@ -16,6 +16,7 @@
 
 package androidx.paging
 
+import kotlin.jvm.JvmOverloads
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -43,7 +44,7 @@ public class Pager<Key : Any, Value : Any>
     config: PagingConfig,
     initialKey: Key? = null,
     remoteMediator: RemoteMediator<Key, Value>?,
-    pagingSourceFactory: () -> PagingSource<Key, Value>
+    pagingSourceFactory: PagingSourceFactory<Key, Value>
 ) {
     // Experimental usage is internal, so opt-in is allowed here.
     @JvmOverloads
@@ -53,6 +54,14 @@ public class Pager<Key : Any, Value : Any>
         initialKey: Key? = null,
         pagingSourceFactory: () -> PagingSource<Key, Value>
     ) : this(config, initialKey, null, pagingSourceFactory)
+
+    // Experimental usage is propagated to public API via constructor argument.
+    @ExperimentalPagingApi constructor(
+        config: PagingConfig,
+        initialKey: Key? = null,
+        remoteMediator: RemoteMediator<Key, Value>?,
+        pagingSourceFactory: () -> PagingSource<Key, Value>
+    ) : this(config, initialKey, remoteMediator, PagingSourceFactory { pagingSourceFactory() })
 
     /**
      * A cold [Flow] of [PagingData], which emits new instances of [PagingData] once they become

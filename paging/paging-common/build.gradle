@@ -34,6 +34,10 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                api(libs.kotlinStdlibCommon)
+                api(libs.kotlinCoroutinesCore)
+                implementation("co.touchlab:stately-concurrency:1.2.0")
+                implementation("co.touchlab:stately-iso-collections:1.2.0")
             }
         }
         commonTest {
@@ -51,9 +55,6 @@ kotlin {
         }
         jvmMain {
             dependencies {
-                api(libs.kotlinStdlib)
-                api(libs.kotlinCoroutinesCore)
-
                 // TODO Uncomment
                 // samples(project(":paging:paging-samples"))
             }
@@ -78,6 +79,10 @@ androidx {
     description = "Android Paging-Common"
     legacyDisableKotlinStrictApiMode = true // TODO: Re-enable this!
     publishPlatforms = ["jvm", "js"]
+}
+
+repositories {
+    mavenCentral()
 }
 
 // Allow usage of Kotlin's @OptIn.
