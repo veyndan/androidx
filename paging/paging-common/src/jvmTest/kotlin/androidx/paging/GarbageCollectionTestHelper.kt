@@ -16,10 +16,10 @@
 
 package androidx.paging
 
+import co.touchlab.stately.concurrency.AtomicBoolean
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
 import kotlin.test.assertContentEquals
@@ -44,7 +44,7 @@ internal class GarbageCollectionTestHelper {
                 val arraySize = (Math.random() * 1000).toInt()
                 leak.add(ByteArray(arraySize))
                 System.gc()
-            } while (continueTriggeringGc.get())
+            } while (continueTriggeringGc.value)
         }
         var collectedItemCount = 0
         val expectedItemCount = size - expected.sumOf { it.second }
@@ -53,7 +53,7 @@ internal class GarbageCollectionTestHelper {
         ) {
             collectedItemCount++
         }
-        continueTriggeringGc.set(false)
+        continueTriggeringGc.value = false
         val leakedObjects = countLiveObjects()
         val leakedObjectToStrings = references.mapNotNull {
             it.get()

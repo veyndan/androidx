@@ -24,7 +24,7 @@ import androidx.paging.RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH
 import androidx.paging.RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH
 import androidx.paging.RemoteMediatorMock.LoadEvent
 import androidx.paging.TestPagingSource.Companion.LOAD_ERROR
-import java.util.concurrent.atomic.AtomicBoolean
+import co.touchlab.stately.concurrency.AtomicBoolean
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -528,7 +528,7 @@ class RemoteMediatorAccessorTest {
                 return try {
                     super.load(loadType, state)
                 } finally {
-                    loading.set(false)
+                    loading.value = false
                 }
             }
         }
@@ -614,7 +614,7 @@ class RemoteMediatorAccessorTest {
                 return try {
                     super.load(loadType, state)
                 } finally {
-                    loading.set(false)
+                    loading.value = false
                 }
             }
         }
