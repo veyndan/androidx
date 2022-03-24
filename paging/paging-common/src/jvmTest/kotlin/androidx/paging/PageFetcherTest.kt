@@ -24,7 +24,6 @@ import androidx.paging.PagingSource.LoadResult
 import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH
 import androidx.paging.RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -498,8 +497,8 @@ class PageFetcherTest {
         advanceUntilIdle()
         assertEquals(1, fetcherState.pagingDataList.size)
         assertEquals(1, fetcherState2.pagingDataList.size)
-        assertThat(fetcherState.pageEventLists.first()).isNotEmpty()
-        assertThat(fetcherState2.pageEventLists.first()).isNotEmpty()
+        assertTrue(fetcherState.pageEventLists.first().isNotEmpty())
+        assertTrue(fetcherState2.pageEventLists.first().isNotEmpty())
     }
 
     @Test
@@ -1541,7 +1540,7 @@ class PageFetcherTest {
         val fetcherState = collectFetcherState(pageFetcher)
         advanceUntilIdle()
 
-        assertThat(remoteMediator.newLoadEvents).isNotEmpty()
+        assertTrue(remoteMediator.newLoadEvents.isNotEmpty())
         fetcherState.job.cancel()
     }
 
