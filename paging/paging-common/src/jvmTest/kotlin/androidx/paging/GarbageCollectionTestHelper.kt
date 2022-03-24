@@ -16,13 +16,13 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertWithMessage
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.reflect.KClass
+import kotlin.test.assertContentEquals
 
 internal class GarbageCollectionTestHelper {
     private val queue = ReferenceQueue<Any>()
@@ -58,12 +58,14 @@ internal class GarbageCollectionTestHelper {
         val leakedObjectToStrings = references.mapNotNull {
             it.get()
         }.joinToString("\n")
-        assertWithMessage(
+        assertContentEquals(
+            expected.toList(),
+            leakedObjects,
             """
             expected to collect $expectedItemCount, collected $collectedItemCount.
             live objects: $leakedObjectToStrings
             """.trimIndent()
-        ).that(leakedObjects).containsExactlyElementsIn(expected)
+        )
     }
 
     /**
