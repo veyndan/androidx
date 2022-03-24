@@ -22,6 +22,7 @@ import androidx.paging.LoadType.REFRESH
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,9 +44,9 @@ class HintHandlerTest {
 
     @Test
     fun initialState() {
-        assertThat(hintHandler.lastAccessHint).isNull()
-        assertThat(hintHandler.currentValue(APPEND)).isNull()
-        assertThat(hintHandler.currentValue(PREPEND)).isNull()
+        assertNull(hintHandler.lastAccessHint)
+        assertNull(hintHandler.currentValue(APPEND))
+        assertNull(hintHandler.currentValue(PREPEND))
     }
 
     @Test
