@@ -64,8 +64,6 @@ kotlin {
         }
         jvmTest {
             dependencies {
-                implementation(project(":internal-testutils-ktx"))
-                implementation(project(":internal-testutils-paging"))
                 implementation(libs.kotlinTestJunit)
             }
         }
