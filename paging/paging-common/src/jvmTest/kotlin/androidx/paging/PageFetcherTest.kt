@@ -247,7 +247,7 @@ class PageFetcherTest {
                 fetcherState.pageEventLists[1]
             )
 
-            assertThat(pagingSources[0]).isNotEqualTo(pagingSources[1])
+            assertNotEquals(pagingSources[1], pagingSources[0])
             fetcherState.job.cancel()
         }
 
