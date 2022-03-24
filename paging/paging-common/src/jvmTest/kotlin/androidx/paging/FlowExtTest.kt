@@ -19,7 +19,6 @@ package androidx.paging
 import androidx.paging.CombineSource.INITIAL
 import androidx.paging.CombineSource.OTHER
 import androidx.paging.CombineSource.RECEIVER
-import com.google.common.truth.Truth.assertThat
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -292,7 +291,7 @@ class FlowExtTest {
             }
 
             // Never emit the same values twice.
-            assertThat(result).containsNoDuplicates()
+            assertEquals(result.toSet().toList(), result)
 
             // Assert order of emissions
             result.scan(0 to 0) { acc, next ->
