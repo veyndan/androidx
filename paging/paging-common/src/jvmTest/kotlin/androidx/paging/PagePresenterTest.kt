@@ -25,8 +25,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.fail
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @Suppress("TestFunctionName")
 internal fun <T : Any> PagePresenter(
@@ -81,7 +79,6 @@ internal fun <T : Any> PagePresenter<T>.dropPages(
 internal fun <T : Any> PagePresenter<T>.asList() = List(size) { get(it) }
 
 @Suppress("SameParameterValue")
-@RunWith(JUnit4::class)
 class PagePresenterTest {
     private fun verifyAppend(
         initialItems: Int,

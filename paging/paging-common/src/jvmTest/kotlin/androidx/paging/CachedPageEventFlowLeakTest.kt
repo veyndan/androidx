@@ -28,13 +28,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 /**
  * reproduces b/203594733
  */
-@RunWith(JUnit4::class)
 public class CachedPageEventFlowLeakTest {
     private val gcHelper = GarbageCollectionTestHelper()
 
