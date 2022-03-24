@@ -296,8 +296,8 @@ class FlowExtTest {
 
             // Assert order of emissions
             result.scan(0 to 0) { acc, next ->
-                assertThat(next.first).isAtLeast(acc.first)
-                assertThat(next.second).isAtLeast(acc.second)
+                assertTrue(next.first >= acc.first)
+                assertTrue(next.second >= acc.second)
                 next
             }
 
