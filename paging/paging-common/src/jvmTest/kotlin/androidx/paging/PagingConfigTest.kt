@@ -18,8 +18,8 @@ package androidx.paging
 
 import androidx.paging.PagingConfig.Companion.MAX_SIZE_UNBOUNDED
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.Assert.assertEquals
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
