@@ -16,9 +16,9 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CancellationException
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -168,8 +168,7 @@ class SimpleChannelFlowTest(
             collection.cancel(CancellationException("test message"))
             collection.join()
             assertContentEquals(listOf(0, 1, 2), dispatched)
-            assertThat(producerException).hasMessageThat()
-                .contains("test message")
+            assertContains(producerException!!.message!!, "test message")
         }
     }
 
@@ -193,8 +192,7 @@ class SimpleChannelFlowTest(
                 }
             }
         }
-        assertThat(producerException).hasMessageThat()
-            .contains("consumer had failed")
+        assertContains(producerException!!.message!!, "consumer had failed")
     }
 
     @Test
@@ -225,8 +223,7 @@ class SimpleChannelFlowTest(
                 combinedFlow.toList()
             )
         }
-        assertThat(producerException).hasMessageThat()
-            .contains("Child of the scoped flow was cancelled")
+        assertContains(producerException!!.message!!, "Child of the scoped flow was cancelled")
     }
 
     @Test
