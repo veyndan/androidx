@@ -301,7 +301,7 @@ class FlowExtTest {
             }
 
             // Check we don't miss any emissions
-            assertThat(result).hasSize(1999)
+            assertEquals(1999, result.size)
         }
     }
 

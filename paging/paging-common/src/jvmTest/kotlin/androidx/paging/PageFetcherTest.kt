@@ -470,7 +470,7 @@ class PageFetcherTest {
 
         // Providing an invalid PagingSource should automatically trigger invalidation
         // regardless of when the invalidation callback is registered.
-        assertThat(pagingSources).hasSize(2)
+        assertEquals(2, pagingSources.size)
 
         // The first PagingSource is immediately invalid, so we shouldn't keep an invalidate
         // listener registered on it.
@@ -480,7 +480,7 @@ class PageFetcherTest {
         // Trigger new generation, should unregister from older PagingSource.
         pageFetcher.refresh()
         advanceUntilIdle()
-        assertThat(pagingSources).hasSize(3)
+        assertEquals(3, pagingSources.size)
         assertEquals(0, pagingSources[1].invalidateCallbackCount)
         assertEquals(1, pagingSources[2].invalidateCallbackCount)
 
@@ -760,16 +760,16 @@ class PageFetcherTest {
         // First PagingSource starts immediately invalid and creates a new PagingSource, but does
         // not finish initial page load.
         runCurrent()
-        assertThat(pagingSources).hasSize(2)
+        assertEquals(2, pagingSources.size)
         assertTrue(pagingSources[0].invalid)
-        assertThat(loadedPages).hasSize(0)
+        assertEquals(0, loadedPages.size)
 
         advanceUntilIdle()
 
         // After draining tasks, we should immediately get a second generation which triggers
         // page load, skipping the initial load from first generation due to cancellation.
         assertFalse(pagingSources[1].invalid)
-        assertThat(loadedPages).hasSize(1)
+        assertEquals(1, loadedPages.size)
 
         job.cancel()
     }

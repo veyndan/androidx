@@ -3238,7 +3238,7 @@ class PageFetcherSnapshotTest {
         )
         val fetcherState = collectFetcherState(pager)
         advanceUntilIdle()
-        assertThat(fetcherState.pageEventLists).hasSize(2)
+        assertEquals(2, fetcherState.pageEventLists.size)
         assertContentEquals(
             listOf(
                 remoteLoadStateUpdate<Int>(
