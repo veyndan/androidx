@@ -22,6 +22,7 @@ import androidx.paging.CombineSource.RECEIVER
 import com.google.common.truth.Truth.assertThat
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -260,9 +261,9 @@ class FlowExtTest {
 
         // We can't guarantee whether cancellation will propagate before or after the second item
         // is emitted, but we should never get the third.
-        assertThat(flow1Emissions.size).isIn(1..2)
-        assertThat(flow2Emissions.size).isIn(1..2)
-        assertThat(result.size).isIn(1..2)
+        assertContains(1..2, flow1Emissions.size)
+        assertContains(1..2, flow2Emissions.size)
+        assertContains(1..2, result.size)
     }
 
     @Test
