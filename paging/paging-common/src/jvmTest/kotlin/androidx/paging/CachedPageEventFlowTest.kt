@@ -16,7 +16,6 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -133,12 +132,12 @@ class CachedPageEventFlowTest(
             appendEvent
         ) + manyNewAppendEvents + finalAppendEvent
         runCurrent()
-        assertThat(fastCollector.items()).containsExactlyElementsIn(fullList).inOrder()
+        assertContentEquals(fullList, fastCollector.items())
         assertFalse(fastCollector.isActive())
         assertTrue(slowCollector.isActive())
         assertTrue(lateSlowCollector.isActive())
         advanceUntilIdle()
-        assertThat(slowCollector.items()).containsExactlyElementsIn(fullList).inOrder()
+        assertContentEquals(fullList, slowCollector.items())
         assertFalse(slowCollector.isActive())
 
         val lateCollectorState = localRefresh(

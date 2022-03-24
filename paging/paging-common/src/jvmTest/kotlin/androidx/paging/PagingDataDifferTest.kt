@@ -24,7 +24,6 @@ import androidx.paging.PagingSource.LoadResult
 import androidx.testutils.DirectDispatcher
 import androidx.testutils.MainDispatcherRule
 import androidx.testutils.TestDispatcher
-import com.google.common.truth.Truth.assertThat
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -1071,7 +1070,7 @@ class PagingDataDifferTest(
         // execute queued initial REFRESH
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(refreshLocal = Loading),
@@ -1087,7 +1086,7 @@ class PagingDataDifferTest(
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(refreshLocal = Loading),
@@ -1109,7 +1108,7 @@ class PagingDataDifferTest(
         val collectLoadStates = differ.collectLoadStates()
         // execute initial refresh
         loadDispatcher.queue.poll()?.run()
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(
@@ -1167,7 +1166,7 @@ class PagingDataDifferTest(
         // initial REFRESH
         loadDispatcher.executeAll()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(refreshLocal = Loading),
@@ -1181,7 +1180,7 @@ class PagingDataDifferTest(
 
         loadDispatcher.executeAll()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 12)
+        assertContentEquals(0 until 12, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(
@@ -1222,7 +1221,7 @@ class PagingDataDifferTest(
         // the LoadResult.Invalid from failed APPEND triggers new pagingSource + initial REFRESH
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(11 until 20)
+        assertContentEquals(11 until 20, differ.snapshot())
         assertContentEquals(
             listOf(localLoadStatesOf()),
             differ.newCombinedLoadStates()
@@ -1239,7 +1238,7 @@ class PagingDataDifferTest(
         // initial REFRESH
         loadDispatcher.executeAll()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(refreshLocal = Loading),
@@ -1254,7 +1253,7 @@ class PagingDataDifferTest(
 
         loadDispatcher.executeAll()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(47 until 59)
+        assertContentEquals(47 until 59, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(prependLocal = Loading),
@@ -1286,7 +1285,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // load starts from 0 again because the provided initialKey = 50 is not multi-generational
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         assertContentEquals(
             listOf(localLoadStatesOf(prependLocal = NotLoading.Complete)),
             differ.newCombinedLoadStates()
@@ -1317,7 +1316,7 @@ class PagingDataDifferTest(
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
         assertContentEquals(
             // all local states NotLoading.Incomplete
             listOf(localLoadStatesOf()),
@@ -1341,7 +1340,7 @@ class PagingDataDifferTest(
             ),
             differ.newCombinedLoadStates()
         )
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
 
         // append returns LoadResult.Error
         differ[8]
@@ -1363,14 +1362,14 @@ class PagingDataDifferTest(
             ),
             differ.newCombinedLoadStates()
         )
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
 
         // retry append
         differ.retry()
         loadDispatcher.queue.poll()?.run()
 
         // make sure append success
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 12)
+        assertContentEquals(0 until 12, differ.snapshot())
         // no reset
         assertContentEquals(
             listOf(
@@ -1402,7 +1401,7 @@ class PagingDataDifferTest(
             differ.newCombinedLoadStates()
         )
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
 
         // prepend returns LoadResult.Error
         differ[0]
@@ -1418,7 +1417,7 @@ class PagingDataDifferTest(
             ),
             differ.newCombinedLoadStates()
         )
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
 
         // retry prepend
         differ.retry()
@@ -1426,7 +1425,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // make sure prepend success
-        assertThat(differ.snapshot()).containsExactlyElementsIn(47 until 59)
+        assertContentEquals(47 until 59, differ.snapshot())
         assertContentEquals(
             listOf(
                 localLoadStatesOf(prependLocal = Loading),
@@ -1463,7 +1462,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // refresh retry does not trigger new gen
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         // Goes directly from Error --> Loading without resetting refresh to NotLoading
         assertContentEquals(
             listOf(
@@ -1492,7 +1491,7 @@ class PagingDataDifferTest(
             differ.newCombinedLoadStates()
         )
         assertEquals(9, differ.size)
-        assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
+        assertContentEquals(50 until 59, differ.snapshot())
 
         // prepend returns LoadResult.Error
         differ[0]
@@ -1514,7 +1513,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // Initial load starts from 0 because initialKey is single gen.
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         assertContentEquals(
             listOf(
                 // second gen REFRESH load. The Error prepend state was automatically reset to
@@ -1553,7 +1552,7 @@ class PagingDataDifferTest(
 
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
+        assertContentEquals(0 until 9, differ.snapshot())
         // Goes directly from Error --> Loading without resetting refresh to NotLoading
         assertContentEquals(
             listOf(

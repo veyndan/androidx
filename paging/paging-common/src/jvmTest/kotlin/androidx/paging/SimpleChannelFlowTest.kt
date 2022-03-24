@@ -94,7 +94,7 @@ class SimpleChannelFlowTest(
         }
         testScope.runTest {
             assertContentEquals(listOf(0, 1, 2, 3), channelFlow.take(4).toList())
-            assertThat(emittedValues).containsExactlyElementsIn((0..9).toList())
+            assertContentEquals((0..9).toList(), emittedValues)
         }
     }
 
