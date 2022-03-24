@@ -16,11 +16,11 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertThat
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -226,7 +226,6 @@ class SingleRunnerTest {
         ) {
             output.add("d")
         }
-        assertThat(output)
-            .containsExactly("a", "b", "c", "d")
+        assertContentEquals(listOf("a", "b", "c", "d"), output)
     }
 }

@@ -21,10 +21,10 @@ package androidx.paging
 import androidx.paging.ActiveFlowTracker.FlowType
 import androidx.paging.ActiveFlowTracker.FlowType.PAGED_DATA_FLOW
 import androidx.paging.ActiveFlowTracker.FlowType.PAGE_EVENT_FLOW
-import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -461,10 +461,9 @@ class CachingTest {
                     .onEach {
                         items.addAll(
                             it.pages.flatMap {
-                                assertThat(
+                                assertContentEquals(
+                                    listOf(expectedVersion),
                                     it.data.map { it.pagingSourceId }.toSet()
-                                ).containsExactly(
-                                    expectedVersion
                                 )
                                 it.data
                             }

@@ -24,8 +24,8 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.LoadType.REFRESH
 import androidx.paging.PageEvent.Drop
 import androidx.paging.PageEvent.StaticList
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.runner.RunWith
@@ -242,13 +242,16 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            localRefresh(
-                pages = listOf(TransformablePage(data = listOf("a", "b", "c"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = LoadStates.IDLE,
-            )
+        assertContentEquals(
+            listOf(
+                localRefresh(
+                    pages = listOf(TransformablePage(data = listOf("a", "b", "c"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = LoadStates.IDLE,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 
@@ -276,14 +279,17 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            remoteRefresh(
-                pages = listOf(TransformablePage(data = listOf("a", "b", "c"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = nonDefaultloadStates,
-                mediator = nonDefaultloadStates,
-            )
+        assertContentEquals(
+            listOf(
+                remoteRefresh(
+                    pages = listOf(TransformablePage(data = listOf("a", "b", "c"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = nonDefaultloadStates,
+                    mediator = nonDefaultloadStates,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 
@@ -328,14 +334,17 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            remoteRefresh(
-                pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = overridenloadStates,
-                mediator = overridenloadStates,
-            )
+        assertContentEquals(
+            listOf(
+                remoteRefresh(
+                    pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = overridenloadStates,
+                    mediator = overridenloadStates,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 
@@ -380,14 +389,17 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            remoteRefresh(
-                pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = overridenloadStates,
-                mediator = initialLoadStates,
-            )
+        assertContentEquals(
+            listOf(
+                remoteRefresh(
+                    pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = overridenloadStates,
+                    mediator = initialLoadStates,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 
@@ -432,14 +444,17 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            remoteRefresh(
-                pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = initialLoadStates,
-                mediator = overridenloadStates,
-            )
+        assertContentEquals(
+            listOf(
+                remoteRefresh(
+                    pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = initialLoadStates,
+                    mediator = overridenloadStates,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 
@@ -473,14 +488,17 @@ class FlattenedPageEventStorageTest {
             ),
             list.snapshot()
         )
-        assertThat(list.getAsEvents()).containsExactly(
-            remoteRefresh(
-                pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
-                placeholdersBefore = 0,
-                placeholdersAfter = 0,
-                source = nonDefaultloadStates,
-                mediator = nonDefaultloadStates,
-            )
+        assertContentEquals(
+            listOf(
+                remoteRefresh(
+                    pages = listOf(TransformablePage(data = listOf("x", "y", "z"))),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 0,
+                    source = nonDefaultloadStates,
+                    mediator = nonDefaultloadStates,
+                )
+            ),
+            list.getAsEvents()
         )
     }
 

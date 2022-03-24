@@ -16,8 +16,8 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,9 +39,7 @@ class ConflatedEventBusTest {
         assertTrue(collector.values.isEmpty())
         bus.send(Unit)
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(Unit)
+        assertContentEquals(listOf(Unit), collector.values)
     }
 
     @Test
@@ -51,14 +49,10 @@ class ConflatedEventBusTest {
             it.start()
         }
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(1)
+        assertContentEquals(listOf(1), collector.values)
         bus.send(2)
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(1, 2)
+        assertContentEquals(listOf(1, 2), collector.values)
     }
 
     @Test
@@ -68,14 +62,10 @@ class ConflatedEventBusTest {
             it.start()
         }
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(1)
+        assertContentEquals(listOf(1), collector.values)
         bus.send(1)
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(1, 1)
+        assertContentEquals(listOf(1, 1), collector.values)
     }
 
     @Test
@@ -86,14 +76,10 @@ class ConflatedEventBusTest {
         bus.send(2)
         collector.start()
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(2)
+        assertContentEquals(listOf(2), collector.values)
         bus.send(3)
         testScope.runCurrent()
-        assertThat(
-            collector.values
-        ).containsExactly(2, 3)
+        assertContentEquals(listOf(2, 3), collector.values)
     }
 
     @Test
@@ -109,16 +95,16 @@ class ConflatedEventBusTest {
             it.start()
         }
         testScope.runCurrent()
-        assertThat(c1.values).containsExactly(1, 2)
-        assertThat(c2.values).containsExactly(2)
+        assertContentEquals(listOf(1, 2), c1.values)
+        assertContentEquals(listOf(2), c2.values)
         bus.send(3)
         testScope.runCurrent()
-        assertThat(c1.values).containsExactly(1, 2, 3)
-        assertThat(c2.values).containsExactly(2, 3)
+        assertContentEquals(listOf(1, 2, 3), c1.values)
+        assertContentEquals(listOf(2, 3), c2.values)
         bus.send(3)
         testScope.runCurrent()
-        assertThat(c1.values).containsExactly(1, 2, 3, 3)
-        assertThat(c2.values).containsExactly(2, 3, 3)
+        assertContentEquals(listOf(1, 2, 3, 3), c1.values)
+        assertContentEquals(listOf(2, 3, 3), c2.values)
     }
 
     private fun <T : Any> ConflatedEventBus<T>.createCollector() = Collector(testScope, this)

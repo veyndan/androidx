@@ -19,6 +19,7 @@ package androidx.paging
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CancellationException
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -62,7 +63,7 @@ class SimpleChannelFlowTest(
         }
         testScope.runTest {
             val items = channelFlow.toList()
-            assertThat(items).containsExactly(1, 2)
+            assertContentEquals(listOf(1, 2), items)
         }
     }
 
@@ -78,7 +79,7 @@ class SimpleChannelFlowTest(
         }
         testScope.runTest {
             val items = channelFlow.toList()
-            assertThat(items).containsExactly(1, 3, 2).inOrder()
+            assertContentEquals(listOf(1, 3, 2), items)
         }
     }
 
@@ -92,7 +93,7 @@ class SimpleChannelFlowTest(
             }
         }
         testScope.runTest {
-            assertThat(channelFlow.take(4).toList()).containsExactly(0, 1, 2, 3)
+            assertContentEquals(listOf(0, 1, 2, 3), channelFlow.take(4).toList())
             assertThat(emittedValues).containsExactlyElementsIn((0..9).toList())
         }
     }
@@ -107,14 +108,14 @@ class SimpleChannelFlowTest(
             }
         }
         testScope.runTest {
-            assertThat(channelFlow.buffer(0).take(4).toList()).containsExactly(0, 1, 2, 3)
+            assertContentEquals(listOf(0, 1, 2, 3), channelFlow.buffer(0).take(4).toList())
             when (impl) {
                 Impl.CHANNEL_FLOW -> {
-                    assertThat(emittedValues).containsExactly(0, 1, 2, 3)
+                    assertContentEquals(listOf(0, 1, 2, 3), emittedValues)
                 }
                 else -> {
                     // simple channel flow cannot fuse properly, hence has an extra value
-                    assertThat(emittedValues).containsExactly(0, 1, 2, 3, 4)
+                    assertContentEquals(listOf(0, 1, 2, 3, 4), emittedValues)
                 }
             }
         }
@@ -166,7 +167,7 @@ class SimpleChannelFlowTest(
             advanceTimeBy(250)
             collection.cancel(CancellationException("test message"))
             collection.join()
-            assertThat(dispatched).containsExactly(0, 1, 2)
+            assertContentEquals(listOf(0, 1, 2), dispatched)
             assertThat(producerException).hasMessageThat()
                 .contains("test message")
         }
@@ -219,10 +220,9 @@ class SimpleChannelFlowTest(
             }
         }
         testScope.runTest {
-            assertThat(
+            assertContentEquals(
+                listOf(5, 13, 26),
                 combinedFlow.toList()
-            ).containsExactly(
-                5, 13, 26
             )
         }
         assertThat(producerException).hasMessageThat()
@@ -237,7 +237,7 @@ class SimpleChannelFlowTest(
             awaitCancellation()
         }
         testScope.runTest {
-            assertThat(flow.toList()).containsExactly(1)
+            assertContentEquals(listOf(1), flow.toList())
         }
     }
 

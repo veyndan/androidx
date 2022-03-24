@@ -22,6 +22,7 @@ import androidx.paging.CombineSource.RECEIVER
 import com.google.common.truth.Truth.assertThat
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -51,37 +52,41 @@ class FlowExtTest {
     @Test
     fun scan_basic() = testScope.runTest {
         val arguments = mutableListOf<Pair<Int, Int>>()
-        assertThat(
+        assertContentEquals(
+            listOf(0, 1, 3, 6),
             flowOf(1, 2, 3).simpleScan(0) { acc, value ->
                 arguments.add(acc to value)
                 value + acc
             }.toList()
-        ).containsExactly(
-            0, 1, 3, 6
-        ).inOrder()
-        assertThat(arguments).containsExactly(
-            0 to 1,
-            1 to 2,
-            3 to 3
-        ).inOrder()
+        )
+        assertContentEquals(
+            listOf(
+                0 to 1,
+                1 to 2,
+                3 to 3
+            ),
+            arguments
+        )
     }
 
     @Test
     fun scan_initialValue() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf("x"),
             emptyFlow<Int>().simpleScan("x") { _, value ->
                 "$value"
             }.toList()
-        ).containsExactly("x")
+        )
     }
 
     @Test
     fun runningReduce_basic() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf(1, 3, 6, 10),
             flowOf(1, 2, 3, 4).simpleRunningReduce { acc, value ->
                 acc + value
             }.toList()
-        ).containsExactly(1, 3, 6, 10)
+        )
     }
 
     @Test
@@ -96,7 +101,8 @@ class FlowExtTest {
 
     @Test
     fun mapLatest() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf("1-1", "4-4"),
             flowOf(1, 2, 3, 4)
                 .onEach {
                     delay(1)
@@ -105,9 +111,7 @@ class FlowExtTest {
                     delay(value.toLong())
                     "$value-$value"
                 }.toList()
-        ).containsExactly(
-            "1-1", "4-4"
-        ).inOrder()
+        )
     }
 
     @Test
@@ -122,7 +126,8 @@ class FlowExtTest {
 
     @Test
     fun flatMapLatest() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf(1, 2, 2, 3, 3, 3, 4, 4, 4, 4),
             flowOf(1, 2, 3, 4)
                 .onEach {
                     delay(1)
@@ -134,9 +139,7 @@ class FlowExtTest {
                         }
                     }
                 }.toList()
-        ).containsExactly(
-            1, 2, 2, 3, 3, 3, 4, 4, 4, 4
-        ).inOrder()
+        )
     }
 
     @Test
@@ -174,7 +177,7 @@ class FlowExtTest {
 
         flow2.send("A")
         advanceUntilIdle()
-        assertThat(result).containsExactly("1A", "2A")
+        assertContentEquals(listOf("1A", "2A"), result)
 
         // This should automatically propagate cancellation to the launched collector.
         flow1.close()
@@ -194,13 +197,13 @@ class FlowExtTest {
             .combine(flow2, slowTransform)
             .toList()
         advanceUntilIdle()
-        assertThat(batchedCombine).containsExactly("1A", "3B", "3C")
+        assertContentEquals(listOf("1A", "3B", "3C"), batchedCombine)
 
         val unbatchedCombine = flow1
             .combineWithoutBatching(flow2) { num, letter, _ -> slowTransform(num, letter) }
             .toList()
         advanceUntilIdle()
-        assertThat(unbatchedCombine).containsExactly("1A", "2A", "2B", "3B", "3C")
+        assertContentEquals(listOf("1A", "2A", "2B", "3B", "3C"), unbatchedCombine)
     }
 
     @Test
@@ -227,12 +230,12 @@ class FlowExtTest {
 
         flow2.send(2)
         advanceUntilIdle()
-        assertThat(result).containsExactly(INITIAL, RECEIVER)
+        assertContentEquals(listOf(INITIAL, RECEIVER), result)
 
         flow1.send(1)
         flow2.send(2)
         advanceUntilIdle()
-        assertThat(result).containsExactly(INITIAL, RECEIVER, RECEIVER, OTHER)
+        assertContentEquals(listOf(INITIAL, RECEIVER, RECEIVER, OTHER), result)
 
         // This should automatically propagate cancellation to the launched collector.
         flow1.close()
@@ -334,17 +337,20 @@ class FlowExtTest {
 
             advanceUntilIdle()
             assertTrue(job.isCompleted)
-            assertThat(result).containsExactly(
-                SendResult(0, 0, INITIAL),
-                SendResult(1, 0, RECEIVER),
-                SendResult(2, 0, RECEIVER),
-                SendResult(3, 0, RECEIVER),
-                SendResult(4, 0, RECEIVER),
-                SendResult(5, 0, RECEIVER),
-                SendResult(6, 0, RECEIVER),
-                SendResult(7, 0, RECEIVER),
-                SendResult(8, 0, RECEIVER),
-                SendResult(9, 0, RECEIVER),
+            assertContentEquals(
+                listOf(
+                    SendResult(0, 0, INITIAL),
+                    SendResult(1, 0, RECEIVER),
+                    SendResult(2, 0, RECEIVER),
+                    SendResult(3, 0, RECEIVER),
+                    SendResult(4, 0, RECEIVER),
+                    SendResult(5, 0, RECEIVER),
+                    SendResult(6, 0, RECEIVER),
+                    SendResult(7, 0, RECEIVER),
+                    SendResult(8, 0, RECEIVER),
+                    SendResult(9, 0, RECEIVER),
+                ),
+                result
             )
         }
 
@@ -373,17 +379,20 @@ class FlowExtTest {
 
             advanceUntilIdle()
             assertTrue(job.isCompleted)
-            assertThat(result).containsExactly(
-                SendResult(0, 0, INITIAL),
-                SendResult(0, 1, OTHER),
-                SendResult(0, 2, OTHER),
-                SendResult(0, 3, OTHER),
-                SendResult(0, 4, OTHER),
-                SendResult(0, 5, OTHER),
-                SendResult(0, 6, OTHER),
-                SendResult(0, 7, OTHER),
-                SendResult(0, 8, OTHER),
-                SendResult(0, 9, OTHER),
+            assertContentEquals(
+                listOf(
+                    SendResult(0, 0, INITIAL),
+                    SendResult(0, 1, OTHER),
+                    SendResult(0, 2, OTHER),
+                    SendResult(0, 3, OTHER),
+                    SendResult(0, 4, OTHER),
+                    SendResult(0, 5, OTHER),
+                    SendResult(0, 6, OTHER),
+                    SendResult(0, 7, OTHER),
+                    SendResult(0, 8, OTHER),
+                    SendResult(0, 9, OTHER),
+                ),
+                result
             )
         }
 

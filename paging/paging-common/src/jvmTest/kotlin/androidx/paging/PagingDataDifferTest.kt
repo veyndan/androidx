@@ -27,6 +27,7 @@ import androidx.testutils.TestDispatcher
 import com.google.common.truth.Truth.assertThat
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -727,11 +728,14 @@ class PagingDataDifferTest(
                 )
             )
         )
-        assertThat(combinedLoadStates).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-            )
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                )
+            ),
+            combinedLoadStates
         )
 
         // Should emit real values to new collectors immediately
@@ -741,11 +745,14 @@ class PagingDataDifferTest(
                 newCombinedLoadStates.add(it)
             }
         }
-        assertThat(newCombinedLoadStates).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-            )
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                )
+            ),
+            newCombinedLoadStates
         )
 
         loadStateJob.cancel()
@@ -785,18 +792,21 @@ class PagingDataDifferTest(
                 receiver = PagingData.NOOP_RECEIVER,
             )
         )
-        assertThat(combinedLoadStates.getAllAndClear()).containsExactly(
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prepend = Loading,
-                append = Loading,
-                refreshLocal = Loading,
-                prependLocal = Loading,
-                appendLocal = Loading,
-                refreshRemote = Loading,
-                prependRemote = Loading,
-                appendRemote = Loading,
-            )
+        assertContentEquals(
+            listOf(
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prepend = Loading,
+                    append = Loading,
+                    refreshLocal = Loading,
+                    prependLocal = Loading,
+                    appendLocal = Loading,
+                    refreshRemote = Loading,
+                    prependRemote = Loading,
+                    appendRemote = Loading,
+                )
+            ),
+            combinedLoadStates.getAllAndClear()
         )
 
         // Send a static list without load states, which should preserve the previous state.
@@ -810,18 +820,21 @@ class PagingDataDifferTest(
                 newCombinedLoadStates.add(it)
             }
         }
-        assertThat(newCombinedLoadStates.getAllAndClear()).containsExactly(
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prepend = Loading,
-                append = Loading,
-                refreshLocal = Loading,
-                prependLocal = Loading,
-                appendLocal = Loading,
-                refreshRemote = Loading,
-                prependRemote = Loading,
-                appendRemote = Loading,
-            )
+        assertContentEquals(
+            listOf(
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prepend = Loading,
+                    append = Loading,
+                    refreshLocal = Loading,
+                    prependLocal = Loading,
+                    appendLocal = Loading,
+                    refreshRemote = Loading,
+                    prependRemote = Loading,
+                    appendRemote = Loading,
+                )
+            ),
+            newCombinedLoadStates.getAllAndClear()
         )
 
         loadStateJob.cancel()
@@ -861,18 +874,21 @@ class PagingDataDifferTest(
                 receiver = PagingData.NOOP_RECEIVER,
             )
         )
-        assertThat(combinedLoadStates.getAllAndClear()).containsExactly(
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prepend = Loading,
-                append = Loading,
-                refreshLocal = Loading,
-                prependLocal = Loading,
-                appendLocal = Loading,
-                refreshRemote = Loading,
-                prependRemote = Loading,
-                appendRemote = Loading,
-            )
+        assertContentEquals(
+            listOf(
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prepend = Loading,
+                    append = Loading,
+                    refreshLocal = Loading,
+                    prependLocal = Loading,
+                    appendLocal = Loading,
+                    refreshRemote = Loading,
+                    prependRemote = Loading,
+                    appendRemote = Loading,
+                )
+            ),
+            combinedLoadStates.getAllAndClear()
         )
 
         // Send a static list without load states, which should preserve the previous state.
@@ -886,18 +902,21 @@ class PagingDataDifferTest(
                 newCombinedLoadStates.add(it)
             }
         }
-        assertThat(newCombinedLoadStates.getAllAndClear()).containsExactly(
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prepend = Loading,
-                append = Loading,
-                refreshLocal = Loading,
-                prependLocal = Loading,
-                appendLocal = Loading,
-                refreshRemote = Loading,
-                prependRemote = Loading,
-                appendRemote = Loading,
-            )
+        assertContentEquals(
+            listOf(
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prepend = Loading,
+                    append = Loading,
+                    refreshLocal = Loading,
+                    prependLocal = Loading,
+                    appendLocal = Loading,
+                    refreshRemote = Loading,
+                    prependRemote = Loading,
+                    appendRemote = Loading,
+                )
+            ),
+            newCombinedLoadStates.getAllAndClear()
         )
 
         loadStateJob.cancel()
@@ -970,21 +989,27 @@ class PagingDataDifferTest(
                 )
             )
         )
-        assertThat(combinedLoadStateCapture.newEvents()).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-            )
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                )
+            ),
+            combinedLoadStateCapture.newEvents()
         )
 
         // Should emit real values to new listeners immediately
         val newCombinedLoadStateCapture = CombinedLoadStatesCapture()
         differ.addLoadStateListener(newCombinedLoadStateCapture)
-        assertThat(newCombinedLoadStateCapture.newEvents()).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-            )
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                )
+            ),
+            newCombinedLoadStateCapture.newEvents()
         )
     }
 
@@ -1047,9 +1072,12 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         differ.refresh()
@@ -1060,9 +1088,12 @@ class PagingDataDifferTest(
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf()
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf()
+            ),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1079,39 +1110,48 @@ class PagingDataDifferTest(
         // execute initial refresh
         loadDispatcher.queue.poll()?.run()
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(
-                refreshLocal = Loading
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    refreshLocal = Loading
+                ),
+                localLoadStatesOf(
+                    refreshLocal = NotLoading(endOfPaginationReached = false),
+                    prependLocal = NotLoading(endOfPaginationReached = true)
+                )
             ),
-            localLoadStatesOf(
-                refreshLocal = NotLoading(endOfPaginationReached = false),
-                prependLocal = NotLoading(endOfPaginationReached = true)
-            )
+            differ.newCombinedLoadStates()
         )
         loadStateCallbacks.clear()
         differ.refresh()
         // after a refresh, make sure the loading event comes in 1 piece w/ the end of pagination
         // reset
         loadDispatcher.queue.poll()?.run()
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(
-                refreshLocal = Loading,
-                prependLocal = NotLoading(endOfPaginationReached = false)
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    refreshLocal = Loading,
+                    prependLocal = NotLoading(endOfPaginationReached = false)
+                ),
+                localLoadStatesOf(
+                    refreshLocal = NotLoading(endOfPaginationReached = false),
+                    prependLocal = NotLoading(endOfPaginationReached = true)
+                ),
             ),
-            localLoadStatesOf(
-                refreshLocal = NotLoading(endOfPaginationReached = false),
-                prependLocal = NotLoading(endOfPaginationReached = true)
-            ),
+            differ.newCombinedLoadStates()
         )
-        assertThat(loadStateCallbacks).containsExactly(
-            localLoadStatesOf(
-                refreshLocal = Loading,
-                prependLocal = NotLoading(endOfPaginationReached = false)
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    refreshLocal = Loading,
+                    prependLocal = NotLoading(endOfPaginationReached = false)
+                ),
+                localLoadStatesOf(
+                    refreshLocal = NotLoading(endOfPaginationReached = false),
+                    prependLocal = NotLoading(endOfPaginationReached = true)
+                ),
             ),
-            localLoadStatesOf(
-                refreshLocal = NotLoading(endOfPaginationReached = false),
-                prependLocal = NotLoading(endOfPaginationReached = true)
-            ),
+            loadStateCallbacks
         )
         collectLoadStates.cancel()
     }
@@ -1128,9 +1168,12 @@ class PagingDataDifferTest(
         loadDispatcher.executeAll()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         // normal append
@@ -1139,12 +1182,15 @@ class PagingDataDifferTest(
         loadDispatcher.executeAll()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 12)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = Loading
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = Loading
+                ),
+                localLoadStatesOf(prependLocal = NotLoading.Complete)
             ),
-            localLoadStatesOf(prependLocal = NotLoading.Complete)
+            differ.newCombinedLoadStates()
         )
 
         // do invalid append which will return LoadResult.Invalid
@@ -1156,26 +1202,30 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         assertEquals(2, pagingSources.size)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            // the invalid append
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = Loading
+        assertContentEquals(
+            listOf(
+                // the invalid append
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = Loading
+                ),
+                // REFRESH on new paging source. Append/Prepend local states is reset because the
+                // LoadStateUpdate from refresh sends the full map of a local LoadStates which was
+                // initialized as IDLE upon new Snapshot.
+                localLoadStatesOf(
+                    refreshLocal = Loading,
+                ),
             ),
-            // REFRESH on new paging source. Append/Prepend local states is reset because the
-            // LoadStateUpdate from refresh sends the full map of a local LoadStates which was
-            // initialized as IDLE upon new Snapshot.
-            localLoadStatesOf(
-                refreshLocal = Loading,
-            ),
+            differ.newCombinedLoadStates()
         )
 
         // the LoadResult.Invalid from failed APPEND triggers new pagingSource + initial REFRESH
         loadDispatcher.queue.poll()?.run()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(11 until 20)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(localLoadStatesOf()),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1190,10 +1240,13 @@ class PagingDataDifferTest(
         loadDispatcher.executeAll()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            // all local states NotLoading.Incomplete
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                // all local states NotLoading.Incomplete
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         // normal prepend to ensure LoadStates for Page returns remains the same
@@ -1202,10 +1255,13 @@ class PagingDataDifferTest(
         loadDispatcher.executeAll()
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(47 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(prependLocal = Loading),
-            // all local states NotLoading.Incomplete
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(prependLocal = Loading),
+                // all local states NotLoading.Incomplete
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         // do an invalid prepend which will return LoadResult.Invalid
@@ -1214,13 +1270,16 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         assertEquals(2, pagingSources.size)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            // the invalid prepend
-            localLoadStatesOf(prependLocal = Loading),
-            // REFRESH on new paging source. Append/Prepend local states is reset because the
-            // LoadStateUpdate from refresh sends the full map of a local LoadStates which was
-            // initialized as IDLE upon new Snapshot.
-            localLoadStatesOf(refreshLocal = Loading),
+        assertContentEquals(
+            listOf(
+                // the invalid prepend
+                localLoadStatesOf(prependLocal = Loading),
+                // REFRESH on new paging source. Append/Prepend local states is reset because the
+                // LoadStateUpdate from refresh sends the full map of a local LoadStates which was
+                // initialized as IDLE upon new Snapshot.
+                localLoadStatesOf(refreshLocal = Loading),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         // the LoadResult.Invalid from failed PREPEND triggers new pagingSource + initial REFRESH
@@ -1228,8 +1287,9 @@ class PagingDataDifferTest(
 
         // load starts from 0 again because the provided initialKey = 50 is not multi-generational
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(localLoadStatesOf(prependLocal = NotLoading.Complete)),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1245,10 +1305,11 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         assertTrue(differ.snapshot().isEmpty())
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
+        assertContentEquals(
             // invalid first refresh. The second refresh state update that follows is identical to
             // this LoadStates so it gets de-duped
-            localLoadStatesOf(refreshLocal = Loading),
+            listOf(localLoadStatesOf(refreshLocal = Loading)),
+            differ.newCombinedLoadStates()
         )
 
         // execute second REFRESH load
@@ -1257,9 +1318,10 @@ class PagingDataDifferTest(
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
+        assertContentEquals(
             // all local states NotLoading.Incomplete
-            localLoadStatesOf()
+            listOf(localLoadStatesOf()),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1272,9 +1334,12 @@ class PagingDataDifferTest(
         // initial REFRESH
         loadDispatcher.executeAll()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
+            ),
+            differ.newCombinedLoadStates()
         )
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
 
@@ -1285,15 +1350,18 @@ class PagingDataDifferTest(
 
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = Loading
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = Loading
+                ),
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = LoadState.Error(exception)
+                ),
             ),
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = LoadState.Error(exception)
-            ),
+            differ.newCombinedLoadStates()
         )
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
 
@@ -1304,12 +1372,15 @@ class PagingDataDifferTest(
         // make sure append success
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 12)
         // no reset
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = Loading
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = Loading
+                ),
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
             ),
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1323,9 +1394,12 @@ class PagingDataDifferTest(
         // initial REFRESH
         loadDispatcher.executeAll()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
@@ -1337,9 +1411,12 @@ class PagingDataDifferTest(
 
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(prependLocal = Loading),
-            localLoadStatesOf(prependLocal = LoadState.Error(exception)),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(prependLocal = Loading),
+                localLoadStatesOf(prependLocal = LoadState.Error(exception)),
+            ),
+            differ.newCombinedLoadStates()
         )
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
 
@@ -1350,9 +1427,12 @@ class PagingDataDifferTest(
 
         // make sure prepend success
         assertThat(differ.snapshot()).containsExactlyElementsIn(47 until 59)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(prependLocal = Loading),
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(prependLocal = Loading),
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1368,9 +1448,12 @@ class PagingDataDifferTest(
 
         loadDispatcher.executeAll()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
+            ),
+            differ.newCombinedLoadStates()
         )
         assertTrue(differ.snapshot().isEmpty())
 
@@ -1382,9 +1465,12 @@ class PagingDataDifferTest(
         // refresh retry does not trigger new gen
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
         // Goes directly from Error --> Loading without resetting refresh to NotLoading
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1398,9 +1484,12 @@ class PagingDataDifferTest(
         // initial REFRESH
         loadDispatcher.executeAll()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(),
+            ),
+            differ.newCombinedLoadStates()
         )
         assertEquals(9, differ.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
@@ -1412,9 +1501,12 @@ class PagingDataDifferTest(
 
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(prependLocal = Loading),
-            localLoadStatesOf(prependLocal = LoadState.Error(exception)),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(prependLocal = Loading),
+                localLoadStatesOf(prependLocal = LoadState.Error(exception)),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         // refresh() should reset local LoadStates and trigger new REFRESH
@@ -1423,12 +1515,15 @@ class PagingDataDifferTest(
 
         // Initial load starts from 0 because initialKey is single gen.
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            // second gen REFRESH load. The Error prepend state was automatically reset to
-            // NotLoading.
-            localLoadStatesOf(refreshLocal = Loading),
-            // REFRESH complete
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(
+                // second gen REFRESH load. The Error prepend state was automatically reset to
+                // NotLoading.
+                localLoadStatesOf(refreshLocal = Loading),
+                // REFRESH complete
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1444,9 +1539,12 @@ class PagingDataDifferTest(
 
         loadDispatcher.executeAll()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(refreshLocal = LoadState.Error(exception)),
+            ),
+            differ.newCombinedLoadStates()
         )
         assertTrue(differ.snapshot().isEmpty())
 
@@ -1457,9 +1555,12 @@ class PagingDataDifferTest(
 
         assertThat(differ.snapshot()).containsExactlyElementsIn(0 until 9)
         // Goes directly from Error --> Loading without resetting refresh to NotLoading
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            localLoadStatesOf(refreshLocal = Loading),
-            localLoadStatesOf(prependLocal = NotLoading.Complete),
+        assertContentEquals(
+            listOf(
+                localLoadStatesOf(refreshLocal = Loading),
+                localLoadStatesOf(prependLocal = NotLoading.Complete),
+            ),
+            differ.newCombinedLoadStates()
         )
 
         collectLoadStates.cancel()
@@ -1487,24 +1588,27 @@ class PagingDataDifferTest(
         // allow local refresh to complete but not remote refresh
         advanceTimeBy(600)
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            // local starts loading
-            remoteLoadStatesOf(
-                refreshLocal = Loading,
+        assertContentEquals(
+            listOf(
+                // local starts loading
+                remoteLoadStatesOf(
+                    refreshLocal = Loading,
+                ),
+                // remote starts loading
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    refreshLocal = Loading,
+                    refreshRemote = Loading,
+                ),
+                // local load returns with empty data, mediator is still loading
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                    refreshRemote = Loading,
+                ),
             ),
-            // remote starts loading
-            remoteLoadStatesOf(
-                refresh = Loading,
-                refreshLocal = Loading,
-                refreshRemote = Loading,
-            ),
-            // local load returns with empty data, mediator is still loading
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-                refreshRemote = Loading,
-            ),
+            differ.newCombinedLoadStates()
         )
 
         // refresh triggers new generation & LoadState reset
@@ -1513,52 +1617,61 @@ class PagingDataDifferTest(
         // allow local refresh to complete but not remote refresh
         advanceTimeBy(600)
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
-            // local starts second refresh while mediator continues remote refresh from before
-            remoteLoadStatesOf(
-                refresh = Loading,
-                refreshLocal = Loading,
-                refreshRemote = Loading,
+        assertContentEquals(
+            listOf(
+                // local starts second refresh while mediator continues remote refresh from before
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    refreshLocal = Loading,
+                    refreshRemote = Loading,
+                ),
+                // local load returns empty data
+                remoteLoadStatesOf(
+                    refresh = Loading,
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                    refreshRemote = Loading,
+                ),
             ),
-            // local load returns empty data
-            remoteLoadStatesOf(
-                refresh = Loading,
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-                refreshRemote = Loading,
-            ),
+            differ.newCombinedLoadStates()
         )
 
         // allow remote refresh to complete
         advanceTimeBy(600)
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
+        assertContentEquals(
             // remote refresh returns empty and triggers remote append/prepend
-            remoteLoadStatesOf(
-                prepend = Loading,
-                append = Loading,
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-                prependRemote = Loading,
-                appendRemote = Loading,
+            listOf(
+                remoteLoadStatesOf(
+                    prepend = Loading,
+                    append = Loading,
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                    prependRemote = Loading,
+                    appendRemote = Loading,
+                )
             ),
+            differ.newCombinedLoadStates()
         )
 
         // allow remote append and prepend to complete
         advanceUntilIdle()
 
-        assertThat(differ.newCombinedLoadStates()).containsExactly(
+        assertContentEquals(
             // prepend completes first
-            remoteLoadStatesOf(
-                append = Loading,
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-                appendRemote = Loading,
+            listOf(
+                remoteLoadStatesOf(
+                    append = Loading,
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                    appendRemote = Loading,
+                ),
+                remoteLoadStatesOf(
+                    prependLocal = NotLoading.Complete,
+                    appendLocal = NotLoading.Complete,
+                ),
             ),
-            remoteLoadStatesOf(
-                prependLocal = NotLoading.Complete,
-                appendLocal = NotLoading.Complete,
-            ),
+            differ.newCombinedLoadStates()
         )
 
         job.cancel()

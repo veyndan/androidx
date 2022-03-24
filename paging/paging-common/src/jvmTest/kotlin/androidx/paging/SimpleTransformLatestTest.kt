@@ -16,8 +16,8 @@
 
 package androidx.paging
 
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
@@ -41,7 +41,12 @@ class SimpleTransformLatestTest(
 
     @Test
     fun delayed() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf(
+                "1 - 0", "1 - 1",
+                "2 - 0", "2 - 1",
+                "3 - 0", "3 - 1", "3 - 2"
+            ),
             flowOf(1, 2, 3)
                 .onEach { delay(100) }
                 .testTransformLatest<Int, String> { value ->
@@ -50,32 +55,30 @@ class SimpleTransformLatestTest(
                         delay(75)
                     }
                 }.toList()
-        ).containsExactly(
-            "1 - 0", "1 - 1",
-            "2 - 0", "2 - 1",
-            "3 - 0", "3 - 1", "3 - 2"
-        ).inOrder()
+        )
     }
 
     @Test
     fun allValues() = testScope.runTest {
-        assertThat(
+        assertContentEquals(
+            listOf(
+                "1 - 0", "1 - 1", "1 - 2",
+                "2 - 0", "2 - 1", "2 - 2",
+                "3 - 0", "3 - 1", "3 - 2"
+            ),
             flowOf(1, 2, 3)
                 .onEach { delay(1) }
                 .testTransformLatest<Int, String> { value ->
                     repeat(3) { emit("$value - $it") }
                 }.toList()
-        ).containsExactly(
-            "1 - 0", "1 - 1", "1 - 2",
-            "2 - 0", "2 - 1", "2 - 2",
-            "3 - 0", "3 - 1", "3 - 2"
-        ).inOrder()
+        )
     }
 
     @Test
     fun reusePreviousCollector() = testScope.runTest {
         var prevCollector: FlowCollector<String>? = null
-        assertThat(
+        assertContentEquals(
+            listOf("x-2", "x-3"),
             flowOf(1, 2, 3)
                 .onEach { delay(1) }
                 .testTransformLatest<Int, String> { value ->
@@ -86,7 +89,7 @@ class SimpleTransformLatestTest(
                         prevCollector?.emit("x-$value")
                     }
                 }.toList()
-        ).containsExactly("x-2", "x-3")
+        )
     }
 
     private fun <T, R> Flow<T>.testTransformLatest(

@@ -18,6 +18,7 @@ package androidx.paging
 
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -70,8 +71,9 @@ class CachedPageEventFlowTest(
         )
         upstream.send(refreshEvent)
         runCurrent()
-        assertThat(fastCollector.items()).containsExactly(
-            refreshEvent
+        assertContentEquals(
+            listOf(refreshEvent),
+            fastCollector.items()
         )
         assertTrue(slowCollector.items().isEmpty())
 
@@ -84,15 +86,21 @@ class CachedPageEventFlowTest(
         )
         upstream.send(appendEvent)
         runCurrent()
-        assertThat(fastCollector.items()).containsExactly(
-            refreshEvent,
-            appendEvent
+        assertContentEquals(
+            listOf(
+                refreshEvent,
+                appendEvent
+            ),
+            fastCollector.items()
         )
         assertTrue(slowCollector.items().isEmpty())
         advanceTimeBy(3_000)
-        assertThat(slowCollector.items()).containsExactly(
-            refreshEvent,
-            appendEvent
+        assertContentEquals(
+            listOf(
+                refreshEvent,
+                appendEvent
+            ),
+            slowCollector.items()
         )
         val manyNewAppendEvents = (0 until 100).map {
             localAppend(
@@ -138,9 +146,10 @@ class CachedPageEventFlowTest(
                 it.pages
             },
         )
-        assertThat(lateSlowCollector.items()).containsExactly(
-            lateCollectorState, finalAppendEvent
-        ).inOrder()
+        assertContentEquals(
+            listOf(lateCollectorState, finalAppendEvent),
+            lateSlowCollector.items()
+        )
         assertFalse(lateSlowCollector.isActive())
 
         upstream.close()
@@ -190,7 +199,7 @@ class CachedPageEventFlowTest(
                 )
             ),
         )
-        assertThat(collector2.items()).containsExactly(firstSnapshotRefreshEvent)
+        assertContentEquals(listOf(firstSnapshotRefreshEvent), collector2.items())
         val prependEvent = localPrepend(
             listOf(
                 TransformablePage(
@@ -228,8 +237,9 @@ class CachedPageEventFlowTest(
                 )
             ),
         )
-        assertThat(collector3.items()).containsExactly(
-            finalState
+        assertContentEquals(
+            listOf(finalState),
+            collector3.items()
         )
         assertTrue(collector1.isActive())
         assertTrue(collector2.isActive())
@@ -248,8 +258,9 @@ class CachedPageEventFlowTest(
         runCurrent()
         // since upstream is closed, this should just close
         assertFalse(collector4.isActive())
-        assertThat(collector4.items()).containsExactly(
-            finalState
+        assertContentEquals(
+            listOf(finalState),
+            collector4.items()
         )
     }
 
@@ -285,12 +296,14 @@ class CachedPageEventFlowTest(
         upstream.send(refreshEvent)
         runCurrent()
 
-        assertThat(collector.items()).containsExactly(
-            refreshEvent
+        assertContentEquals(
+            listOf(refreshEvent),
+            collector.items()
         )
 
-        assertThat(collector2.items()).containsExactly(
-            refreshEvent
+        assertContentEquals(
+            listOf(refreshEvent),
+            collector2.items()
         )
 
         upstream.close()
@@ -320,16 +333,18 @@ class CachedPageEventFlowTest(
         runCurrent()
 
         // collector shouldn't receive any idle events before the refresh
-        assertThat(collector.items()).containsExactly(
-            refreshEvent
+        assertContentEquals(
+            listOf(refreshEvent),
+            collector.items()
         )
 
         val delayedCollector = PageCollector(subject.downstreamFlow)
         delayedCollector.collectIn(testScope)
 
         // delayed collector shouldn't receive any idle events since we already have refresh
-        assertThat(delayedCollector.items()).containsExactly(
-            refreshEvent
+        assertContentEquals(
+            listOf(refreshEvent),
+            delayedCollector.items()
         )
 
         upstream.close()

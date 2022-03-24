@@ -21,6 +21,7 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.LoadType.REFRESH
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -218,24 +219,24 @@ class HintHandlerTest {
         assertTrue(appendHints.values.isEmpty())
         hintHandler.processHint(hint)
         runCurrent()
-        assertThat(prependHints.values).containsExactly(hint)
-        assertThat(appendHints.values).containsExactly(hint)
+        assertContentEquals(listOf(hint), prependHints.values)
+        assertContentEquals(listOf(hint), appendHints.values)
 
         // send same hint twice, it should not get dispatched
         hintHandler.processHint(hint.copy())
         runCurrent()
-        assertThat(prependHints.values).containsExactly(hint)
-        assertThat(appendHints.values).containsExactly(hint)
+        assertContentEquals(listOf(hint), prependHints.values)
+        assertContentEquals(listOf(hint), appendHints.values)
 
         // how send that hint as reset, now it should get dispatched
         hintHandler.forceSetHint(PREPEND, hint)
         runCurrent()
-        assertThat(prependHints.values).containsExactly(hint, hint)
-        assertThat(appendHints.values).containsExactly(hint)
+        assertContentEquals(listOf(hint, hint), prependHints.values)
+        assertContentEquals(listOf(hint), appendHints.values)
         hintHandler.forceSetHint(APPEND, hint)
         runCurrent()
-        assertThat(prependHints.values).containsExactly(hint, hint)
-        assertThat(appendHints.values).containsExactly(hint, hint)
+        assertContentEquals(listOf(hint, hint), prependHints.values)
+        assertContentEquals(listOf(hint, hint), appendHints.values)
     }
 
     private fun HintHandler.assertValues(
