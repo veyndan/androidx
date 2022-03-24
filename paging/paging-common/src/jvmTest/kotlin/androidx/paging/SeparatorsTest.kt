@@ -23,7 +23,6 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.PageEvent.Drop
 import androidx.paging.TerminalSeparatorType.FULLY_COMPLETE
 import androidx.paging.TerminalSeparatorType.SOURCE_COMPLETE
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,20 +58,7 @@ private fun <T : Any> assertInsertData(
 class SeparatorsTest {
     @Test
     fun refreshFull() = runTest {
-        assertThat(
-            flowOf(
-                localRefresh(
-                    pages = listOf(
-                        listOf("a2", "b1"),
-                        listOf("c1", "c2")
-                    ).toTransformablePages(),
-                    placeholdersAfter = 1,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -95,7 +81,19 @@ class SeparatorsTest {
                     ),
                     placeholdersAfter = 1,
                 )
-            )
+            ),
+            flowOf(
+                localRefresh(
+                    pages = listOf(
+                        listOf("a2", "b1"),
+                        listOf("c1", "c2")
+                    ).toTransformablePages(),
+                    placeholdersAfter = 1,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -108,21 +106,7 @@ class SeparatorsTest {
             placeholdersAfter = 1,
         )
 
-        assertThat(
-            flowOf(
-                refresh,
-                localPrepend(
-                    pages = listOf(
-                        listOf("a1", "b1"),
-                        listOf("b2", "b3")
-                    ).toTransformablePages(2),
-                    placeholdersBefore = 1,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localPrepend(
@@ -146,7 +130,20 @@ class SeparatorsTest {
                     ),
                     placeholdersBefore = 1,
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localPrepend(
+                    pages = listOf(
+                        listOf("a1", "b1"),
+                        listOf("b2", "b3")
+                    ).toTransformablePages(2),
+                    placeholdersBefore = 1,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -159,21 +156,7 @@ class SeparatorsTest {
             placeholdersBefore = 0,
             placeholdersAfter = 1,
         )
-        assertThat(
-            flowOf(
-                refresh,
-                localAppend(
-                    pages = listOf(
-                        listOf("c1", "d1"),
-                        listOf("d2", "d3")
-                    ).toTransformablePages(-1),
-                    placeholdersAfter = 1,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localAppend(
@@ -197,28 +180,26 @@ class SeparatorsTest {
                     ),
                     placeholdersAfter = 1,
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localAppend(
+                    pages = listOf(
+                        listOf("c1", "d1"),
+                        listOf("d2", "d3")
+                    ).toTransformablePages(-1),
+                    placeholdersAfter = 1,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
     @Test
     fun refreshDropFull() = runTest {
-        assertThat(
-            flowOf(
-                localRefresh(
-                    pages = listOf(
-                        listOf("a1"),
-                        listOf("a2")
-                    ).toTransformablePages(),
-                    placeholdersBefore = 0,
-                    placeholdersAfter = 1,
-                ),
-                Drop(APPEND, 1, 1, 4)
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -235,7 +216,21 @@ class SeparatorsTest {
                     placeholdersAfter = 1,
                 ),
                 Drop<String>(APPEND, 1, 1, 4)
-            )
+            ),
+            flowOf(
+                localRefresh(
+                    pages = listOf(
+                        listOf("a1"),
+                        listOf("a2")
+                    ).toTransformablePages(),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 1,
+                ),
+                Drop(APPEND, 1, 1, 4)
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -499,18 +494,7 @@ class SeparatorsTest {
     @Test
     fun refreshEmptyStartDropFull() = runTest {
         // when start terminal separator is inserted, we need to drop count*2 + 1
-        assertThat(
-            flowOf(
-                refresh(
-                    pages = listOf("a1", "b1"),
-                    prepend = NotLoading.Complete
-                ),
-                drop(loadType = PREPEND, minPageOffset = 0, maxPageOffset = 0)
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -540,25 +524,24 @@ class SeparatorsTest {
                     source = loadStates(prepend = NotLoading.Complete)
                 ),
                 drop(loadType = PREPEND, minPageOffset = 0, maxPageOffset = 0)
-            )
+            ),
+            flowOf(
+                refresh(
+                    pages = listOf("a1", "b1"),
+                    prepend = NotLoading.Complete
+                ),
+                drop(loadType = PREPEND, minPageOffset = 0, maxPageOffset = 0)
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
     @Test
     fun refreshEmptyEndDropFull() = runTest {
         // when end terminal separator is inserted, we need to drop count*2 + 1
-        assertThat(
-            flowOf(
-                refresh(
-                    pages = listOf("a1", "b1"),
-                    append = NotLoading.Complete
-                ),
-                drop(loadType = APPEND, minPageOffset = 0, maxPageOffset = 0)
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -587,7 +570,17 @@ class SeparatorsTest {
                     source = loadStates(append = NotLoading.Complete),
                 ),
                 drop(loadType = APPEND, minPageOffset = 0, maxPageOffset = 0)
-            )
+            ),
+            flowOf(
+                refresh(
+                    pages = listOf("a1", "b1"),
+                    append = NotLoading.Complete
+                ),
+                drop(loadType = APPEND, minPageOffset = 0, maxPageOffset = 0)
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -630,24 +623,7 @@ class SeparatorsTest {
 
     @Test
     fun refreshEmptyPagesExceptOne() = runTest {
-        assertThat(
-            flowOf(
-                localRefresh(
-                    pages = listOf(
-                        listOf(),
-                        listOf(),
-                        listOf("a2", "b1"),
-                        listOf(),
-                        listOf()
-                    ).toTransformablePages(),
-                    placeholdersBefore = 0,
-                    placeholdersAfter = 1,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -677,20 +653,14 @@ class SeparatorsTest {
                     placeholdersBefore = 0,
                     placeholdersAfter = 1,
                 )
-            )
-        )
-    }
-
-    @Test
-    fun refreshSparsePages() = runTest {
-        assertThat(
+            ),
             flowOf(
                 localRefresh(
                     pages = listOf(
                         listOf(),
+                        listOf(),
                         listOf("a2", "b1"),
                         listOf(),
-                        listOf("c1", "c2"),
                         listOf()
                     ).toTransformablePages(),
                     placeholdersBefore = 0,
@@ -700,7 +670,12 @@ class SeparatorsTest {
                 terminalSeparatorType = FULLY_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun refreshSparsePages() = runTest {
+        assertEquals(
             listOf(
                 localRefresh(
                     pages = listOf(
@@ -736,7 +711,23 @@ class SeparatorsTest {
                     placeholdersBefore = 0,
                     placeholdersAfter = 1,
                 )
-            )
+            ),
+            flowOf(
+                localRefresh(
+                    pages = listOf(
+                        listOf(),
+                        listOf("a2", "b1"),
+                        listOf(),
+                        listOf("c1", "c2"),
+                        listOf()
+                    ).toTransformablePages(),
+                    placeholdersBefore = 0,
+                    placeholdersAfter = 1,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -749,24 +740,7 @@ class SeparatorsTest {
             placeholdersBefore = 2,
         )
 
-        assertThat(
-            flowOf(
-                refresh,
-                localPrepend(
-                    pages = listOf(
-                        listOf(),
-                        listOf(),
-                        listOf("a1", "b1"),
-                        listOf(),
-                        listOf()
-                    ).toTransformablePages(5),
-                    placeholdersBefore = 0,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localPrepend(
@@ -802,7 +776,23 @@ class SeparatorsTest {
                     ),
                     placeholdersBefore = 0,
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localPrepend(
+                    pages = listOf(
+                        listOf(),
+                        listOf(),
+                        listOf("a1", "b1"),
+                        listOf(),
+                        listOf()
+                    ).toTransformablePages(5),
+                    placeholdersBefore = 0,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -816,24 +806,7 @@ class SeparatorsTest {
             placeholdersAfter = 4,
         )
 
-        assertThat(
-            flowOf(
-                refresh,
-                localPrepend(
-                    pages = listOf(
-                        listOf(),
-                        listOf("a1", "b1"),
-                        listOf(),
-                        listOf("c1", "c2"),
-                        listOf()
-                    ).toTransformablePages(5),
-                    placeholdersBefore = 0,
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localPrepend(
@@ -875,7 +848,23 @@ class SeparatorsTest {
                     ),
                     placeholdersBefore = 0,
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localPrepend(
+                    pages = listOf(
+                        listOf(),
+                        listOf("a1", "b1"),
+                        listOf(),
+                        listOf("c1", "c2"),
+                        listOf()
+                    ).toTransformablePages(5),
+                    placeholdersBefore = 0,
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -889,23 +878,7 @@ class SeparatorsTest {
             placeholdersAfter = 2,
         )
 
-        assertThat(
-            flowOf(
-                refresh,
-                localAppend(
-                    pages = listOf(
-                        listOf(),
-                        listOf(),
-                        listOf("b1", "c1"),
-                        listOf(),
-                        listOf()
-                    ).toTransformablePages(-1),
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localAppend(
@@ -940,7 +913,22 @@ class SeparatorsTest {
                         )
                     ),
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localAppend(
+                    pages = listOf(
+                        listOf(),
+                        listOf(),
+                        listOf("b1", "c1"),
+                        listOf(),
+                        listOf()
+                    ).toTransformablePages(-1),
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
@@ -954,23 +942,7 @@ class SeparatorsTest {
             placeholdersAfter = 4,
         )
 
-        assertThat(
-            flowOf(
-                refresh,
-                localAppend(
-                    pages = listOf(
-                        listOf(),
-                        listOf("b1", "c1"),
-                        listOf(),
-                        listOf("d1", "d2"),
-                        listOf()
-                    ).toTransformablePages(-1),
-                )
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 refresh,
                 localAppend(
@@ -1011,50 +983,28 @@ class SeparatorsTest {
                         )
                     ),
                 )
-            )
+            ),
+            flowOf(
+                refresh,
+                localAppend(
+                    pages = listOf(
+                        listOf(),
+                        listOf("b1", "c1"),
+                        listOf(),
+                        listOf("d1", "d2"),
+                        listOf()
+                    ).toTransformablePages(-1),
+                )
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
     @Test
     fun remoteRefreshEndOfPaginationReached_fullyComplete() = runTest {
-        assertThat(
-            flowOf(
-                remoteLoadStateUpdate(
-                    refreshRemote = Loading
-                ),
-                remoteLoadStateUpdate(
-                    refreshLocal = Loading,
-                    refreshRemote = Loading
-                ),
-                remoteRefresh(
-                    pages = listOf(listOf("a1")).toTransformablePages(),
-                    placeholdersBefore = 1,
-                    placeholdersAfter = 1,
-                    source = loadStates(append = NotLoading.Complete, prepend = NotLoading.Complete)
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete,
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete,
-                    prependRemote = NotLoading.Complete,
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete,
-                    appendRemote = NotLoading.Complete,
-                    prependRemote = NotLoading.Complete,
-                ),
-            ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 remoteLoadStateUpdate(
                     refreshRemote = Loading
@@ -1113,53 +1063,49 @@ class SeparatorsTest {
                         prepend = NotLoading.Complete,
                     ),
                 ),
-            )
+            ),
+            flowOf(
+                remoteLoadStateUpdate(
+                    refreshRemote = Loading
+                ),
+                remoteLoadStateUpdate(
+                    refreshLocal = Loading,
+                    refreshRemote = Loading
+                ),
+                remoteRefresh(
+                    pages = listOf(listOf("a1")).toTransformablePages(),
+                    placeholdersBefore = 1,
+                    placeholdersAfter = 1,
+                    source = loadStates(append = NotLoading.Complete, prepend = NotLoading.Complete)
+                ),
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete,
+                ),
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete,
+                    prependRemote = NotLoading.Complete,
+                ),
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete,
+                    appendRemote = NotLoading.Complete,
+                    prependRemote = NotLoading.Complete,
+                ),
+            ).insertEventSeparators(
+                terminalSeparatorType = FULLY_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 
     @Test
     fun remoteRefreshEndOfPaginationReached_sourceComplete() = runTest {
-        assertThat(
-            flowOf(
-                remoteLoadStateUpdate(
-                    refreshRemote = Loading
-                ),
-                remoteLoadStateUpdate(
-                    refreshLocal = Loading,
-                    refreshRemote = Loading
-                ),
-                remoteRefresh(
-                    pages = listOf(listOf("a1")).toTransformablePages(),
-                    placeholdersBefore = 1,
-                    placeholdersAfter = 1,
-                    source = loadStates(
-                        append = NotLoading.Complete,
-                        prepend = NotLoading.Complete,
-                    ),
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete,
-                    prependRemote = NotLoading.Complete,
-                ),
-                remoteLoadStateUpdate(
-                    appendLocal = NotLoading.Complete,
-                    prependLocal = NotLoading.Complete,
-                    refreshRemote = NotLoading.Complete,
-                    appendRemote = NotLoading.Complete,
-                    prependRemote = NotLoading.Complete,
-                ),
-            ).insertEventSeparators(
-                terminalSeparatorType = SOURCE_COMPLETE,
-                generator = LETTER_SEPARATOR_GENERATOR
-            ).toList()
-        ).isEqualTo(
+        assertEquals(
             listOf(
                 remoteLoadStateUpdate(
                     refreshRemote = Loading
@@ -1224,34 +1170,52 @@ class SeparatorsTest {
                         append = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remotePrependEndOfPaginationReached_fullyComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
+                remoteLoadStateUpdate(
+                    refreshRemote = Loading
+                ),
+                remoteLoadStateUpdate(
+                    refreshLocal = Loading,
+                    refreshRemote = Loading
+                ),
                 remoteRefresh(
                     pages = listOf(listOf("a1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
                     source = loadStates(
-                        prepend = NotLoading.Complete,
                         append = NotLoading.Complete,
+                        prepend = NotLoading.Complete,
                     ),
                 ),
-                // Signalling that remote prepend is done triggers the header to resolve.
                 remoteLoadStateUpdate(
                     appendLocal = NotLoading.Complete,
                     prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete
+                ),
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete,
                     prependRemote = NotLoading.Complete,
-                )
+                ),
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    refreshRemote = NotLoading.Complete,
+                    appendRemote = NotLoading.Complete,
+                    prependRemote = NotLoading.Complete,
+                ),
             ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
+                terminalSeparatorType = SOURCE_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remotePrependEndOfPaginationReached_fullyComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(listOf("a1")).toTransformablePages(),
@@ -1280,13 +1244,7 @@ class SeparatorsTest {
                         prepend = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remotePrependEndOfPaginationReached_sourceComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
                     pages = listOf(listOf("a1")).toTransformablePages(),
@@ -1304,10 +1262,15 @@ class SeparatorsTest {
                     prependRemote = NotLoading.Complete,
                 )
             ).insertEventSeparators(
-                terminalSeparatorType = SOURCE_COMPLETE,
+                terminalSeparatorType = FULLY_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remotePrependEndOfPaginationReached_sourceComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(
@@ -1346,31 +1309,12 @@ class SeparatorsTest {
                         prepend = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remotePrependEndOfPaginationReachedWithDrops_fullyComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
-                    pages = listOf(listOf("b1")).toTransformablePages(),
+                    pages = listOf(listOf("a1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                ),
-                remotePrepend(
-                    pages = listOf(
-                        TransformablePage(
-                            originalPageOffset = -1,
-                            data = listOf("a1"),
-                        )
-                    ),
-                    placeholdersBefore = 0,
                     source = loadStates(
                         prepend = NotLoading.Complete,
                         append = NotLoading.Complete,
@@ -1381,35 +1325,17 @@ class SeparatorsTest {
                     appendLocal = NotLoading.Complete,
                     prependLocal = NotLoading.Complete,
                     prependRemote = NotLoading.Complete,
-                ),
-                // Drop the first page, header and separator between "b1" and "a1"
-                Drop(
-                    loadType = PREPEND,
-                    minPageOffset = -1,
-                    maxPageOffset = -1,
-                    placeholdersRemaining = 1
-                ),
-                remotePrepend(
-                    pages = listOf(
-                        TransformablePage(
-                            originalPageOffset = -1,
-                            data = listOf("a1"),
-                        )
-                    ),
-                    placeholdersBefore = 0,
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                    mediator = loadStates(
-                        prepend = NotLoading.Complete,
-                    ),
-                ),
+                )
             ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
+                terminalSeparatorType = SOURCE_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remotePrependEndOfPaginationReachedWithDrops_fullyComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(listOf("b1")).toTransformablePages(),
@@ -1491,19 +1417,16 @@ class SeparatorsTest {
                         prepend = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remotePrependEndOfPaginationReachedWithDrops_sourceComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
                     pages = listOf(listOf("b1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
-                    source = loadStates(append = NotLoading.Complete),
+                    source = loadStates(
+                        prepend = NotLoading.Complete,
+                        append = NotLoading.Complete,
+                    ),
                 ),
                 remotePrepend(
                     pages = listOf(
@@ -1548,10 +1471,15 @@ class SeparatorsTest {
                     ),
                 ),
             ).insertEventSeparators(
-                terminalSeparatorType = SOURCE_COMPLETE,
+                terminalSeparatorType = FULLY_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remotePrependEndOfPaginationReachedWithDrops_sourceComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(
@@ -1640,34 +1568,66 @@ class SeparatorsTest {
                         prepend = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remoteAppendEndOfPaginationReached_fullyComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
-                    pages = listOf(listOf("a1")).toTransformablePages(),
+                    pages = listOf(listOf("b1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
+                    source = loadStates(append = NotLoading.Complete),
+                ),
+                remotePrepend(
+                    pages = listOf(
+                        TransformablePage(
+                            originalPageOffset = -1,
+                            data = listOf("a1"),
+                        )
+                    ),
+                    placeholdersBefore = 0,
                     source = loadStates(
                         prepend = NotLoading.Complete,
                         append = NotLoading.Complete,
                     ),
                 ),
-                // Signalling that remote append is done triggers the footer to resolve.
+                // Signalling that remote prepend is done triggers the header to resolve.
                 remoteLoadStateUpdate(
                     appendLocal = NotLoading.Complete,
                     prependLocal = NotLoading.Complete,
-                    appendRemote = NotLoading.Complete,
+                    prependRemote = NotLoading.Complete,
+                ),
+                // Drop the first page, header and separator between "b1" and "a1"
+                Drop(
+                    loadType = PREPEND,
+                    minPageOffset = -1,
+                    maxPageOffset = -1,
+                    placeholdersRemaining = 1
+                ),
+                remotePrepend(
+                    pages = listOf(
+                        TransformablePage(
+                            originalPageOffset = -1,
+                            data = listOf("a1"),
+                        )
+                    ),
+                    placeholdersBefore = 0,
+                    source = loadStates(
+                        prepend = NotLoading.Complete,
+                        append = NotLoading.Complete,
+                    ),
+                    mediator = loadStates(
+                        prepend = NotLoading.Complete,
+                    ),
                 ),
             ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
+                terminalSeparatorType = SOURCE_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remoteAppendEndOfPaginationReached_fullyComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(listOf("a1")).toTransformablePages(),
@@ -1696,13 +1656,7 @@ class SeparatorsTest {
                         append = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remoteAppendEndOfPaginationReached_sourceComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
                     pages = listOf(listOf("a1")).toTransformablePages(),
@@ -1720,10 +1674,15 @@ class SeparatorsTest {
                     appendRemote = NotLoading.Complete,
                 ),
             ).insertEventSeparators(
-                terminalSeparatorType = SOURCE_COMPLETE,
+                terminalSeparatorType = FULLY_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remoteAppendEndOfPaginationReached_sourceComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(
@@ -1762,29 +1721,12 @@ class SeparatorsTest {
                         append = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remoteAppendEndOfPaginationReachedWithDrops_fullyComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
-                    pages = listOf(listOf("b1")).toTransformablePages(),
+                    pages = listOf(listOf("a1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                    ),
-                ),
-                remoteAppend(
-                    pages = listOf(
-                        TransformablePage(
-                            originalPageOffset = 1,
-                            data = listOf("c1"),
-                        )
-                    ),
                     source = loadStates(
                         prepend = NotLoading.Complete,
                         append = NotLoading.Complete,
@@ -1796,33 +1738,16 @@ class SeparatorsTest {
                     prependLocal = NotLoading.Complete,
                     appendRemote = NotLoading.Complete,
                 ),
-                // Drop the last page, footer and separator between "b1" and "c1"
-                Drop(
-                    loadType = APPEND,
-                    minPageOffset = 1,
-                    maxPageOffset = 1,
-                    placeholdersRemaining = 1
-                ),
-                remoteAppend(
-                    pages = listOf(
-                        TransformablePage(
-                            originalPageOffset = 1,
-                            data = listOf("c1"),
-                        )
-                    ),
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                    mediator = loadStates(
-                        append = NotLoading.Complete,
-                    ),
-                ),
             ).insertEventSeparators(
-                terminalSeparatorType = FULLY_COMPLETE,
+                terminalSeparatorType = SOURCE_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remoteAppendEndOfPaginationReachedWithDrops_fullyComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(listOf("b1")).toTransformablePages(),
@@ -1898,19 +1823,15 @@ class SeparatorsTest {
                         append = NotLoading.Complete,
                     ),
                 ),
-            )
-        )
-    }
-
-    @Test
-    fun remoteAppendEndOfPaginationReachedWithDrops_sourceComplete() = runTest {
-        assertThat(
+            ),
             flowOf(
                 remoteRefresh(
                     pages = listOf(listOf("b1")).toTransformablePages(),
                     placeholdersBefore = 1,
                     placeholdersAfter = 1,
-                    source = loadStates(prepend = NotLoading.Complete),
+                    source = loadStates(
+                        prepend = NotLoading.Complete,
+                    ),
                 ),
                 remoteAppend(
                     pages = listOf(
@@ -1953,10 +1874,15 @@ class SeparatorsTest {
                     ),
                 ),
             ).insertEventSeparators(
-                terminalSeparatorType = SOURCE_COMPLETE,
+                terminalSeparatorType = FULLY_COMPLETE,
                 generator = LETTER_SEPARATOR_GENERATOR
             ).toList()
-        ).isEqualTo(
+        )
+    }
+
+    @Test
+    fun remoteAppendEndOfPaginationReachedWithDrops_sourceComplete() = runTest {
+        assertEquals(
             listOf(
                 remoteRefresh(
                     pages = listOf(
@@ -2042,7 +1968,58 @@ class SeparatorsTest {
                         append = NotLoading.Complete,
                     ),
                 ),
-            )
+            ),
+            flowOf(
+                remoteRefresh(
+                    pages = listOf(listOf("b1")).toTransformablePages(),
+                    placeholdersBefore = 1,
+                    placeholdersAfter = 1,
+                    source = loadStates(prepend = NotLoading.Complete),
+                ),
+                remoteAppend(
+                    pages = listOf(
+                        TransformablePage(
+                            originalPageOffset = 1,
+                            data = listOf("c1"),
+                        )
+                    ),
+                    source = loadStates(
+                        prepend = NotLoading.Complete,
+                        append = NotLoading.Complete,
+                    ),
+                ),
+                // Signalling that remote append is done triggers the footer to resolve.
+                remoteLoadStateUpdate(
+                    appendLocal = NotLoading.Complete,
+                    prependLocal = NotLoading.Complete,
+                    appendRemote = NotLoading.Complete,
+                ),
+                // Drop the last page, footer and separator between "b1" and "c1"
+                Drop(
+                    loadType = APPEND,
+                    minPageOffset = 1,
+                    maxPageOffset = 1,
+                    placeholdersRemaining = 1
+                ),
+                remoteAppend(
+                    pages = listOf(
+                        TransformablePage(
+                            originalPageOffset = 1,
+                            data = listOf("c1"),
+                        )
+                    ),
+                    source = loadStates(
+                        prepend = NotLoading.Complete,
+                        append = NotLoading.Complete,
+                    ),
+                    mediator = loadStates(
+                        append = NotLoading.Complete,
+                    ),
+                ),
+            ).insertEventSeparators(
+                terminalSeparatorType = SOURCE_COMPLETE,
+                generator = LETTER_SEPARATOR_GENERATOR
+            ).toList()
         )
     }
 

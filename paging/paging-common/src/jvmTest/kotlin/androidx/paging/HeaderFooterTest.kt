@@ -17,7 +17,6 @@
 package androidx.paging
 
 import androidx.paging.LoadState.NotLoading
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,7 +82,7 @@ class HeaderFooterTest {
             source = fullLoadStates
         )
 
-        assertThat(actual).isEqualTo(expected)
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -114,7 +113,7 @@ class HeaderFooterTest {
             source = fullLoadStates
         )
 
-        assertThat(actual).isEqualTo(expected)
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -203,7 +202,7 @@ class HeaderFooterTest {
             source = fullLoadStates
         )
 
-        assertThat(actual).isEqualTo(expected)
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -230,6 +229,6 @@ class HeaderFooterTest {
             source = fullLoadStates
         )
 
-        assertThat(actual).isEqualTo(expected)
+        assertEquals(expected, actual)
     }
 }

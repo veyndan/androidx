@@ -145,7 +145,7 @@ class SingleRunnerTest {
         // Despite launching separately, with different delays, we should see these always
         // interleave in the same order, since the delays aren't allowed to run in parallel and
         // each launch will cancel the other one's delay.
-        assertThat(output.joinToString("")).isEqualTo("0a1b2c3d")
+        assertEquals("0a1b2c3d", output.joinToString(""))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -183,9 +183,10 @@ class SingleRunnerTest {
                 job2.join()
             }
         }
-        assertThat(output).isEqualTo(
+        assertEquals(
             // if cancellation is ignored, make sure we wait for it to finish.
-            (0 until 20).toList()
+            (0 until 20).toList(),
+            output
         )
     }
 

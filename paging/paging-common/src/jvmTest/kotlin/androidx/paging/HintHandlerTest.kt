@@ -21,6 +21,7 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.LoadType.REFRESH
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -241,9 +242,9 @@ class HintHandlerTest {
         append: ViewportHint,
         lastAccessHint: ViewportHint.Access?
     ) {
-        assertThat(currentValue(PREPEND)).isEqualTo(prepend)
-        assertThat(currentValue(APPEND)).isEqualTo(append)
-        assertThat(hintHandler.lastAccessHint).isEqualTo(lastAccessHint)
+        assertEquals(prepend, currentValue(PREPEND))
+        assertEquals(append, currentValue(APPEND))
+        assertEquals(lastAccessHint, hintHandler.lastAccessHint)
     }
 
     private fun HintHandler.currentValue(

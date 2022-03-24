@@ -18,6 +18,7 @@ package androidx.paging
 
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
@@ -172,8 +173,9 @@ class CachedPageEventFlowTest(
         upstream.send(appendEvent)
         collector1.collectIn(testScope)
         runCurrent()
-        assertThat(collector1.items()).isEqualTo(
-            listOf(refreshEvent, appendEvent)
+        assertEquals(
+            listOf(refreshEvent, appendEvent),
+            collector1.items()
         )
         val collector2 = PageCollector(subject.downstreamFlow)
         collector2.collectIn(testScope)
@@ -200,11 +202,13 @@ class CachedPageEventFlowTest(
             ),
         )
         upstream.send(prependEvent)
-        assertThat(collector1.items()).isEqualTo(
-            listOf(refreshEvent, appendEvent, prependEvent)
+        assertEquals(
+            listOf(refreshEvent, appendEvent, prependEvent),
+            collector1.items()
         )
-        assertThat(collector2.items()).isEqualTo(
-            listOf(firstSnapshotRefreshEvent, prependEvent)
+        assertEquals(
+            listOf(firstSnapshotRefreshEvent, prependEvent),
+            collector2.items()
         )
         val collector3 = PageCollector(subject.downstreamFlow)
         collector3.collectIn(testScope)

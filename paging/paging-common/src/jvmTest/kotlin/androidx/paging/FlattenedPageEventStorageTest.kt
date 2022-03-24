@@ -26,6 +26,7 @@ import androidx.paging.PageEvent.Drop
 import androidx.paging.PageEvent.StaticList
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -36,7 +37,7 @@ class FlattenedPageEventStorageTest {
 
     @Test
     fun empty() {
-        assertThat(list.snapshot()).isEqualTo(Snapshot<String>())
+        assertEquals(Snapshot<String>(), list.snapshot())
         assertTrue(list.getAsEvents().isEmpty())
     }
 
@@ -51,12 +52,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersAfter = 5,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c"),
                 placeholdersBefore = 3,
                 placeholdersAfter = 5
-            )
+            ),
+            list.snapshot()
         )
     }
 
@@ -80,12 +82,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersBefore = 1,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("x1", "x2", "a", "b", "c"),
                 placeholdersBefore = 1,
                 placeholdersAfter = 5
-            )
+            ),
+            list.snapshot()
         )
     }
 
@@ -110,12 +113,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersAfter = 2,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c", "x1", "x2", "x3"),
                 placeholdersBefore = 3,
                 placeholdersAfter = 2
-            )
+            ),
+            list.snapshot()
         )
     }
 
@@ -139,12 +143,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersAfter = 4,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("x", "y"),
                 placeholdersBefore = 2,
                 placeholdersAfter = 4
-            )
+            ),
+            list.snapshot()
         )
     }
 
@@ -160,12 +165,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersAfter = 5,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c", "d", "e"),
                 placeholdersBefore = 3,
                 placeholdersAfter = 5
-            )
+            ),
+            list.snapshot()
         )
         list.add(
             Drop(
@@ -175,12 +181,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersRemaining = 6
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("d", "e"),
                 placeholdersBefore = 6,
                 placeholdersAfter = 5
-            )
+            ),
+            list.snapshot()
         )
     }
 
@@ -196,12 +203,13 @@ class FlattenedPageEventStorageTest {
                 placeholdersAfter = 5,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c", "d", "e"),
                 placeholdersBefore = 3,
                 placeholdersAfter = 5
-            )
+            ),
+            list.snapshot()
         )
         list.add(
             Drop(
@@ -211,26 +219,28 @@ class FlattenedPageEventStorageTest {
                 placeholdersRemaining = 7
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c"),
                 placeholdersBefore = 3,
                 placeholdersAfter = 7
-            )
+            ),
+            list.snapshot()
         )
     }
 
     @Test
     fun staticList_initWithoutLoadStates() {
         list.add(StaticList(listOf("a", "b", "c")))
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("a", "b", "c"),
                 sourceLoadStates = LoadStates.IDLE,
                 mediatorLoadStates = null,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             localRefresh(
@@ -256,14 +266,15 @@ class FlattenedPageEventStorageTest {
                 mediatorLoadStates = nonDefaultloadStates,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("a", "b", "c"),
                 sourceLoadStates = nonDefaultloadStates,
                 mediatorLoadStates = nonDefaultloadStates,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             remoteRefresh(
@@ -307,14 +318,15 @@ class FlattenedPageEventStorageTest {
                 mediatorLoadStates = overridenloadStates,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("x", "y", "z"),
                 sourceLoadStates = overridenloadStates,
                 mediatorLoadStates = overridenloadStates,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             remoteRefresh(
@@ -358,14 +370,15 @@ class FlattenedPageEventStorageTest {
                 mediatorLoadStates = null,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("x", "y", "z"),
                 sourceLoadStates = overridenloadStates,
                 mediatorLoadStates = initialLoadStates,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             remoteRefresh(
@@ -409,14 +422,15 @@ class FlattenedPageEventStorageTest {
                 mediatorLoadStates = overridenloadStates,
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("x", "y", "z"),
                 sourceLoadStates = initialLoadStates,
                 mediatorLoadStates = overridenloadStates,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             remoteRefresh(
@@ -449,14 +463,15 @@ class FlattenedPageEventStorageTest {
             )
         )
         list.add(StaticList(listOf("x", "y", "z")))
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 placeholdersBefore = 0,
                 placeholdersAfter = 0,
                 items = listOf("x", "y", "z"),
                 sourceLoadStates = nonDefaultloadStates,
                 mediatorLoadStates = nonDefaultloadStates,
-            )
+            ),
+            list.snapshot()
         )
         assertThat(list.getAsEvents()).containsExactly(
             remoteRefresh(
@@ -483,7 +498,7 @@ class FlattenedPageEventStorageTest {
                 source = loadStates(prepend = Loading, append = error)
             )
         )
-        assertThat(list.snapshot()).isEqualTo(
+        assertEquals(
             Snapshot(
                 items = listOf("a", "b", "c", "d", "e"),
                 placeholdersBefore = 3,
@@ -493,7 +508,8 @@ class FlattenedPageEventStorageTest {
                     prepend = Loading,
                     append = error
                 )
-            )
+            ),
+            list.snapshot()
         )
     }
 

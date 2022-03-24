@@ -19,7 +19,6 @@ package androidx.paging
 import androidx.paging.PagingSource.LoadParams
 import androidx.paging.PagingSource.LoadResult
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -243,7 +242,7 @@ class PagingSourceTest {
 
         pagingSource.invalidate()
         pagingSource.registerInvalidatedCallback { invalidateCalls++ }
-        assertThat(invalidateCalls).isEqualTo(1)
+        assertEquals(1, invalidateCalls)
     }
 
     @Test
@@ -258,7 +257,7 @@ class PagingSourceTest {
             invalidateCalls++
         }
         pagingSource.invalidate()
-        assertThat(invalidateCalls).isEqualTo(3)
+        assertEquals(3, invalidateCalls)
     }
 
     data class Key(val name: String, val id: Int)

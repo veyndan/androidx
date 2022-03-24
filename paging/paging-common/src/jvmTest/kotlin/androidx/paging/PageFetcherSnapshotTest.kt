@@ -1860,13 +1860,14 @@ class PageFetcherSnapshotTest {
                     originalPageOffsetLast = 0
                 )
             )
-            assertThat(pager.currentPagingState()).isEqualTo(
+            assertEquals(
                 PagingState<Int, Int>(
                     pages = listOf(),
                     anchorPosition = 0,
                     config = config,
                     leadingPlaceholderCount = 0
-                )
+                ),
+                pager.currentPagingState()
             )
         }
     }
@@ -1895,13 +1896,14 @@ class PageFetcherSnapshotTest {
                 originalPageOffsetLast = 0
             )
         )
-        assertThat(pager.currentPagingState()).isEqualTo(
+        assertEquals(
             PagingState<Int, Int>(
                 pages = listOf(),
                 anchorPosition = 0,
                 config = config,
                 leadingPlaceholderCount = 0
-            )
+            ),
+            pager.currentPagingState()
         )
     }
 
@@ -2027,13 +2029,14 @@ class PageFetcherSnapshotTest {
             retryFlow = retryBus.flow
         )
 
-        assertThat(pager.currentPagingState()).isEqualTo(
+        assertEquals(
             PagingState<Int, Int>(
                 pages = listOf(),
                 anchorPosition = null,
                 config = config,
                 leadingPlaceholderCount = 0,
-            )
+            ),
+            pager.currentPagingState()
         )
     }
 
@@ -2671,7 +2674,7 @@ class PageFetcherSnapshotTest {
                     placeholdersAfter = 96,
                 )
             )
-            assertThat(eventsByGeneration[0]).isEqualTo(refreshEvents)
+            assertEquals(refreshEvents, eventsByGeneration[0])
             accessHint(
                 ViewportHint.Access(
                     pageOffset = 0,
@@ -2909,7 +2912,7 @@ class PageFetcherSnapshotTest {
                 ),
             )
             awaitEventCount(initialEvents.size + postHintEvents.size)
-            assertThat(eventsByGeneration[0]).isEqualTo(initialEvents + postHintEvents)
+            assertEquals(initialEvents + postHintEvents, eventsByGeneration[0])
         }
     }
 
@@ -3026,7 +3029,7 @@ class PageFetcherSnapshotTest {
         val fetcherState = collectFetcherState(pager)
         advanceUntilIdle()
 
-        assertThat(fetcherState.pageEventLists.size).isEqualTo(2)
+        assertEquals(2, fetcherState.pageEventLists.size)
         assertThat(fetcherState.pageEventLists[0]).containsExactly(
             remoteLoadStateUpdate<Int>(
                 refreshLocal = Loading,
@@ -3721,9 +3724,9 @@ class PageFetcherSnapshotTest {
         }
         testScope.runCurrent()
         expected.forEachIndexed { index, list ->
-            assertThat(actual.getOrNull(index) ?: emptyList<PageEvent<T>>()).isEqualTo(list)
+            assertEquals(list, actual.getOrNull(index) ?: emptyList<PageEvent<T>>())
         }
-        assertThat(actual.size).isEqualTo(expected.size)
+        assertEquals(expected.size, actual.size)
     }
 
     internal interface MultiGenerationCollectionScope<T : Any> {

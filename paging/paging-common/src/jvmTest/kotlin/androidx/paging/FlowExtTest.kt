@@ -22,6 +22,7 @@ import androidx.paging.CombineSource.RECEIVER
 import com.google.common.truth.Truth.assertThat
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -408,8 +409,9 @@ class FlowExtTest {
             }
 
             advanceUntilIdle()
-            assertThat(result.first()).isEqualTo(
+            assertEquals(
                 SendResult(0, 0, INITIAL),
+                result.first()
             )
         }
     }

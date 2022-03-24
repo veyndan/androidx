@@ -199,7 +199,7 @@ class PagingDataDifferTest(
         // Initial state:
         // [null, null, [-1], [1], [3], null, null]
         assertNull(differ[0])
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Initial(
                     presentedItemsBefore = 0,
@@ -215,7 +215,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -1,
                     originalPageOffsetLast = 1
                 ),
-            )
+            ),
+            receiver.hints
         )
 
         // Insert a new page, PagingDataDiffer should try to resend hint since index 0 still points
@@ -227,7 +228,7 @@ class PagingDataDifferTest(
                 placeholdersBefore = 2,
             )
         )
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Access(
                     pageOffset = -2,
@@ -237,7 +238,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -2,
                     originalPageOffsetLast = 1
                 )
-            )
+            ),
+            receiver.hints
         )
 
         // Now index 0 has been loaded:
@@ -253,7 +255,7 @@ class PagingDataDifferTest(
 
         // This index points to a valid placeholder that ends up removed by filter().
         assertNull(differ[5])
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Access(
                     pageOffset = 1,
@@ -263,7 +265,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -3,
                     originalPageOffsetLast = 1
                 )
-            )
+            ),
+            receiver.hints
         )
 
         // Should only resend the hint for index 5, since index 0 has already been loaded:
@@ -275,7 +278,7 @@ class PagingDataDifferTest(
                 source = loadStates(prepend = NotLoading.Complete)
             )
         )
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Access(
                     pageOffset = 2,
@@ -285,7 +288,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -3,
                     originalPageOffsetLast = 2
                 )
-            )
+            ),
+            receiver.hints
         )
 
         // Index 5 hasn't loaded, but we are at the end of the list:
@@ -338,7 +342,7 @@ class PagingDataDifferTest(
         // Initial state:
         // [null, null, [-1], [1], [3], null, null]
         assertNull(differ[0])
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Initial(
                     presentedItemsBefore = 0,
@@ -354,7 +358,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -1,
                     originalPageOffsetLast = 1
                 ),
-            )
+            ),
+            receiver.hints
         )
 
         // Insert a new page, PagingDataDiffer should try to resend hint since index 0 still points
@@ -366,7 +371,7 @@ class PagingDataDifferTest(
                 placeholdersBefore = 2,
             )
         )
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf(
                 ViewportHint.Access(
                     pageOffset = -2,
@@ -376,7 +381,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = -2,
                     originalPageOffsetLast = 1
                 )
-            )
+            ),
+            receiver.hints
         )
 
         // Drop the previous page, which reset resendable index state in the PREPEND direction.
@@ -436,13 +442,13 @@ class PagingDataDifferTest(
         }
 
         // Check that peek fetches the correct placeholder
-        assertThat(differ.peek(4)).isEqualTo(0)
+        assertEquals(0, differ.peek(4))
 
         // Check that peek fetches the correct placeholder
         assertNull(differ.peek(0))
 
         // Check that peek does not trigger page fetch.
-        assertThat(receiver.hints).isEqualTo(
+        assertEquals(
             listOf<ViewportHint>(
                 ViewportHint.Initial(
                     presentedItemsBefore = 1,
@@ -450,7 +456,8 @@ class PagingDataDifferTest(
                     originalPageOffsetFirst = 0,
                     originalPageOffsetLast = 0,
                 )
-            )
+            ),
+            receiver.hints
         )
 
         job.cancel()
@@ -469,8 +476,9 @@ class PagingDataDifferTest(
             localRefresh(pages = listOf(TransformablePage(emptyList())))
         )
 
-        assertThat(uiReceiver.hints).isEqualTo(
-            listOf(ViewportHint.Initial(0, 0, 0, 0))
+        assertEquals(
+            listOf(ViewportHint.Initial(0, 0, 0, 0)),
+            uiReceiver.hints
         )
 
         job.cancel()
@@ -485,11 +493,11 @@ class PagingDataDifferTest(
         }
 
         differ.collectFrom(PagingData.empty())
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
 
         // No change to LoadState or presented list should still trigger the listener.
         differ.collectFrom(PagingData.empty())
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         val pager = Pager(PagingConfig(pageSize = 1)) { TestPagingSource(items = listOf()) }
         val job = testScope.launch {
@@ -497,10 +505,10 @@ class PagingDataDifferTest(
         }
 
         // Should wait for new generation to load and apply it first.
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(3)
+        assertEquals(3, listenerEvents.size)
 
         job.cancel()
     }
@@ -521,22 +529,22 @@ class PagingDataDifferTest(
         }
 
         // Should wait for new generation to load and apply it first.
-        assertThat(listenerEvents.size).isEqualTo(0)
+        assertEquals(0, listenerEvents.size)
 
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
 
         // Trigger PREPEND.
         differ[50]
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         // Trigger APPEND + Drop
         differ[52]
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(4)
+        assertEquals(4, listenerEvents.size)
 
         job.cancel()
     }
@@ -552,11 +560,11 @@ class PagingDataDifferTest(
         }
 
         differ.collectFrom(PagingData.empty())
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
 
         // No change to LoadState or presented list should still trigger the listener.
         differ.collectFrom(PagingData.empty())
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         val pager = Pager(PagingConfig(pageSize = 1)) { TestPagingSource(items = listOf()) }
         val job2 = testScope.launch {
@@ -564,10 +572,10 @@ class PagingDataDifferTest(
         }
 
         // Should wait for new generation to load and apply it first.
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(3)
+        assertEquals(3, listenerEvents.size)
 
         job1.cancel()
         job2.cancel()
@@ -591,22 +599,22 @@ class PagingDataDifferTest(
         }
 
         // Should wait for new generation to load and apply it first.
-        assertThat(listenerEvents.size).isEqualTo(0)
+        assertEquals(0, listenerEvents.size)
 
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
 
         // Trigger PREPEND.
         differ[50]
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
 
         // Trigger APPEND + Drop
         differ[52]
-        assertThat(listenerEvents.size).isEqualTo(2)
+        assertEquals(2, listenerEvents.size)
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(4)
+        assertEquals(4, listenerEvents.size)
 
         job1.cancel()
         job2.cancel()
@@ -629,11 +637,11 @@ class PagingDataDifferTest(
         }
 
         // Previous update before collection happened should be ignored.
-        assertThat(listenerEvents.size).isEqualTo(0)
+        assertEquals(0, listenerEvents.size)
 
         // Trigger update; should get immediately received.
         differ.collectFrom(PagingData.empty())
-        assertThat(listenerEvents.size).isEqualTo(1)
+        assertEquals(1, listenerEvents.size)
 
         // Trigger 64 update while collector is still processing; should all get buffered.
         repeat(64) { differ.collectFrom(PagingData.empty()) }
@@ -643,7 +651,7 @@ class PagingDataDifferTest(
 
         // Await all; we should now receive the buffered event.
         advanceUntilIdle()
-        assertThat(listenerEvents.size).isEqualTo(65)
+        assertEquals(65, listenerEvents.size)
 
         job.cancel()
     }
@@ -1050,7 +1058,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
-        assertThat(pagingSources.size).isEqualTo(2)
+        assertEquals(2, pagingSources.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
         assertThat(differ.newCombinedLoadStates()).containsExactly(
             localLoadStatesOf(refreshLocal = Loading),
@@ -1147,7 +1155,7 @@ class PagingDataDifferTest(
         // REFRESH will auto run consecutively and we won't be able to assert them incrementally
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(pagingSources.size).isEqualTo(2)
+        assertEquals(2, pagingSources.size)
         assertThat(differ.newCombinedLoadStates()).containsExactly(
             // the invalid append
             localLoadStatesOf(
@@ -1205,7 +1213,7 @@ class PagingDataDifferTest(
         pagingSources[0].nextLoadResult = LoadResult.Invalid()
         loadDispatcher.queue.poll()?.run()
 
-        assertThat(pagingSources.size).isEqualTo(2)
+        assertEquals(2, pagingSources.size)
         assertThat(differ.newCombinedLoadStates()).containsExactly(
             // the invalid prepend
             localLoadStatesOf(prependLocal = Loading),
@@ -1247,7 +1255,7 @@ class PagingDataDifferTest(
         loadDispatcher.queue.poll()?.run()
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
-        assertThat(pagingSources.size).isEqualTo(2)
+        assertEquals(2, pagingSources.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
         assertThat(differ.newCombinedLoadStates()).containsExactly(
             // all local states NotLoading.Incomplete
@@ -1394,7 +1402,7 @@ class PagingDataDifferTest(
             localLoadStatesOf(refreshLocal = Loading),
             localLoadStatesOf(),
         )
-        assertThat(differ.size).isEqualTo(9)
+        assertEquals(9, differ.size)
         assertThat(differ.snapshot()).containsExactlyElementsIn(50 until 59)
 
         // prepend returns LoadResult.Error

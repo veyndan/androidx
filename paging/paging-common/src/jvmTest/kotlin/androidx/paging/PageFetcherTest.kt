@@ -225,7 +225,7 @@ class PageFetcherTest {
             advanceUntilIdle()
 
             // should have two PagingData returned, one for each paging source
-            assertThat(fetcherState.pagingDataList.size).isEqualTo(2)
+            assertEquals(2, fetcherState.pagingDataList.size)
 
             // First PagingData only returns a loading state because invalidation prevents load
             // completion
@@ -258,7 +258,7 @@ class PageFetcherTest {
             val fetcherState = collectFetcherState(pageFetcher)
             advanceUntilIdle()
 
-            assertThat(fetcherState.pageEventLists.size).isEqualTo(1)
+            assertEquals(1, fetcherState.pageEventLists.size)
             assertThat(fetcherState.newEvents()).containsExactly(
                 localLoadStateUpdate<Int>(refreshLocal = Loading),
                 createRefresh(50..51),
@@ -281,13 +281,14 @@ class PageFetcherTest {
             advanceUntilIdle()
 
             // make sure the append load never completes
-            assertThat(fetcherState.pageEventLists[0].last()).isEqualTo(
+            assertEquals(
                 localLoadStateUpdate<Int>(appendLocal = Loading),
+                fetcherState.pageEventLists[0].last()
             )
 
             // the invalid result handler should exit the append load loop gracefully and allow
             // fetcher to generate a new paging source
-            assertThat(pagingSources.size).isEqualTo(2)
+            assertEquals(2, pagingSources.size)
             assertTrue(pagingSources[0].invalid)
 
             // second generation should load refresh with cached append load params
@@ -311,7 +312,7 @@ class PageFetcherTest {
             val fetcherState = collectFetcherState(pageFetcher)
             advanceUntilIdle()
 
-            assertThat(fetcherState.pageEventLists.size).isEqualTo(1)
+            assertEquals(1, fetcherState.pageEventLists.size)
             assertThat(fetcherState.newEvents()).containsExactly(
                 localLoadStateUpdate<Int>(refreshLocal = Loading),
                 createRefresh(50..51),
@@ -333,13 +334,14 @@ class PageFetcherTest {
             advanceUntilIdle()
 
             // make sure the prepend load never completes
-            assertThat(fetcherState.pageEventLists[0].last()).isEqualTo(
+            assertEquals(
                 localLoadStateUpdate<Int>(prependLocal = Loading),
+                fetcherState.pageEventLists[0].last()
             )
 
             // the invalid result should exit the prepend load loop gracefully and allow fetcher to
             // generate a new paging source
-            assertThat(pagingSources.size).isEqualTo(2)
+            assertEquals(2, pagingSources.size)
             assertTrue(pagingSources[0].invalid)
 
             // second generation should load refresh with cached prepend load params
@@ -455,15 +457,15 @@ class PageFetcherTest {
 
         // The first PagingSource is immediately invalid, so we shouldn't keep an invalidate
         // listener registered on it.
-        assertThat(pagingSources[0].invalidateCallbackCount).isEqualTo(0)
-        assertThat(pagingSources[1].invalidateCallbackCount).isEqualTo(1)
+        assertEquals(0, pagingSources[0].invalidateCallbackCount)
+        assertEquals(1, pagingSources[1].invalidateCallbackCount)
 
         // Trigger new generation, should unregister from older PagingSource.
         pageFetcher.refresh()
         advanceUntilIdle()
         assertThat(pagingSources).hasSize(3)
-        assertThat(pagingSources[1].invalidateCallbackCount).isEqualTo(0)
-        assertThat(pagingSources[2].invalidateCallbackCount).isEqualTo(1)
+        assertEquals(0, pagingSources[1].invalidateCallbackCount)
+        assertEquals(1, pagingSources[2].invalidateCallbackCount)
 
         state.job.cancel()
     }
@@ -477,8 +479,8 @@ class PageFetcherTest {
         fetcherState.job.cancel()
         fetcherState2.job.cancel()
         advanceUntilIdle()
-        assertThat(fetcherState.pagingDataList.size).isEqualTo(1)
-        assertThat(fetcherState2.pagingDataList.size).isEqualTo(1)
+        assertEquals(1, fetcherState.pagingDataList.size)
+        assertEquals(1, fetcherState2.pagingDataList.size)
         assertThat(fetcherState.pageEventLists.first()).isNotEmpty()
         assertThat(fetcherState2.pageEventLists.first()).isNotEmpty()
     }
@@ -579,11 +581,12 @@ class PageFetcherTest {
             val fetcherState = collectFetcherState(pageFetcher)
 
             advanceUntilIdle()
-            assertThat(fetcherState.newEvents()).isEqualTo(
+            assertEquals(
                 listOf<PageEvent<Int>>(
                     localLoadStateUpdate<Int>(refreshLocal = Loading),
                     createRefresh(range = 50..51)
-                )
+                ),
+                fetcherState.newEvents()
             )
 
             // Jump due to sufficiently large presentedItemsBefore
@@ -602,11 +605,12 @@ class PageFetcherTest {
             assertTrue { pagingSources[0].invalid }
             // Assert no new events added to current generation
             assertEquals(2, fetcherState.pageEventLists[0].size)
-            assertThat(fetcherState.newEvents()).isEqualTo(
+            assertEquals(
                 listOf<PageEvent<Int>>(
                     localLoadStateUpdate<Int>(refreshLocal = Loading),
                     createRefresh(range = 50..51)
-                )
+                ),
+                fetcherState.newEvents()
             )
 
             // Jump due to sufficiently large presentedItemsAfter
@@ -625,11 +629,12 @@ class PageFetcherTest {
             assertTrue { pagingSources[1].invalid }
             // Assert no new events added to current generation
             assertEquals(2, fetcherState.pageEventLists[1].size)
-            assertThat(fetcherState.newEvents()).isEqualTo(
+            assertEquals(
                 listOf<PageEvent<Int>>(
                     localLoadStateUpdate<Int>(refreshLocal = Loading),
                     createRefresh(range = 50..51)
-                )
+                ),
+                fetcherState.newEvents()
             )
 
             fetcherState.job.cancel()
@@ -1008,13 +1013,13 @@ class PageFetcherTest {
             advanceUntilIdle()
 
             // Verify 3 generations were instantiated.
-            assertThat(pagingSources.size).isEqualTo(3)
+            assertEquals(3, pagingSources.size)
 
             // First generation should use initialKey.
             assertTrue(pagingSources[0].getRefreshKeyCalls.isEmpty())
 
             // Second generation should receive getRefreshKey call with state from first generation.
-            assertThat(pagingSources[1].getRefreshKeyCalls).isEqualTo(
+            assertEquals(
                 listOf(
                     PagingState(
                         pages = pagingSources[0].loadedPages,
@@ -1022,15 +1027,16 @@ class PageFetcherTest {
                         config = config,
                         leadingPlaceholderCount = 50,
                     )
-                )
+                ),
+                pagingSources[1].getRefreshKeyCalls
             )
 
             // Verify second generation was invalidated before any pages loaded.
             assertTrue(pagingSources[1].loadedPages.isEmpty())
 
             // Third generation should receive getRefreshKey call with state from first generation.
-            assertThat(pagingSources[0].loadedPages.size).isEqualTo(1)
-            assertThat(pagingSources[2].getRefreshKeyCalls).isEqualTo(
+            assertEquals(1, pagingSources[0].loadedPages.size)
+            assertEquals(
                 listOf(
                     PagingState(
                         pages = pagingSources[0].loadedPages,
@@ -1038,7 +1044,8 @@ class PageFetcherTest {
                         config = config,
                         leadingPlaceholderCount = 50,
                     )
-                )
+                ),
+                pagingSources[2].getRefreshKeyCalls
             )
 
             advanceUntilIdle()
@@ -1060,8 +1067,8 @@ class PageFetcherTest {
             advanceUntilIdle()
 
             // Fourth generation should receive getRefreshKey call with state from third generation.
-            assertThat(pagingSources[2].loadedPages.size).isEqualTo(2)
-            assertThat(pagingSources[3].getRefreshKeyCalls).isEqualTo(
+            assertEquals(2, pagingSources[2].loadedPages.size)
+            assertEquals(
                 listOf(
                     PagingState(
                         pages = pagingSources[2].loadedPages,
@@ -1069,7 +1076,8 @@ class PageFetcherTest {
                         config = config,
                         leadingPlaceholderCount = 51,
                     )
-                )
+                ),
+                pagingSources[3].getRefreshKeyCalls
             )
 
             job.cancel()
@@ -1441,7 +1449,7 @@ class PageFetcherTest {
         pageFetcher.refresh()
         advanceUntilIdle()
 
-        assertThat(firstGenerationEventCount).isEqualTo(fetcherState.pageEventLists[0].size)
+        assertEquals(fetcherState.pageEventLists[0].size, firstGenerationEventCount)
 
         fetcherState.job.cancel()
     }

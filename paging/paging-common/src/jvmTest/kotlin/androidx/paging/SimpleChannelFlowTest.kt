@@ -19,6 +19,7 @@ package androidx.paging
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CancellationException
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlinx.coroutines.CompletableDeferred
@@ -138,7 +139,7 @@ class SimpleChannelFlowTest(
         }
         testScope.runTest {
             channelFlow.takeWhile { it < 3 }.toList()
-            assertThat(lastDispatched.await()).isEqualTo(3)
+            assertEquals(3, lastDispatched.await())
         }
     }
 

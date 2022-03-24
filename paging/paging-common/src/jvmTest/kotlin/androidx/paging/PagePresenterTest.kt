@@ -21,7 +21,6 @@ import androidx.paging.LoadType.APPEND
 import androidx.paging.LoadType.PREPEND
 import androidx.paging.PagePresenter.ProcessPageEventCallback
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -316,8 +315,9 @@ class PagePresenterTest {
             callback = callback
         )
 
-        assertThat(callback.getAllAndClear()).isEqualTo(
-            events + listOf(StateEvent(APPEND, false, NotLoading.Incomplete))
+        assertEquals(
+            events + listOf(StateEvent(APPEND, false, NotLoading.Incomplete)),
+            callback.getAllAndClear()
         )
 
         // assert final list state
@@ -357,8 +357,9 @@ class PagePresenterTest {
             callback = callback
         )
 
-        assertThat(callback.getAllAndClear()).isEqualTo(
-            events + listOf(StateEvent(PREPEND, false, NotLoading.Incomplete))
+        assertEquals(
+            events + listOf(StateEvent(PREPEND, false, NotLoading.Incomplete)),
+            callback.getAllAndClear()
         )
 
         // assert final list state

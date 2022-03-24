@@ -25,6 +25,7 @@ import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -85,24 +86,26 @@ class CachingTest {
         val pageFlow = buildPageFlow()
         val firstCollect = pageFlow.collectItemsUntilSize(6)
         val secondCollect = pageFlow.collectItemsUntilSize(9)
-        assertThat(firstCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 6
-            )
+            ),
+            firstCollect
         )
 
-        assertThat(secondCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 1,
                 generation = 0,
                 start = 0,
                 size = 9
-            )
+            ),
+            secondCollect
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(0)
+        assertEquals(0, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -110,24 +113,26 @@ class CachingTest {
         val pageFlow = buildPageFlow().cachedIn(testScope, tracker)
         val firstCollect = pageFlow.collectItemsUntilSize(6)
         val secondCollect = pageFlow.collectItemsUntilSize(9)
-        assertThat(firstCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 6
-            )
+            ),
+            firstCollect
         )
 
-        assertThat(secondCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 9
-            )
+            ),
+            secondCollect
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
+        assertEquals(1, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -141,7 +146,7 @@ class CachingTest {
         }.cachedIn(testScope, tracker)
         val firstCollect = pageFlow.collectItemsUntilSize(6)
         val secondCollect = pageFlow.collectItemsUntilSize(9)
-        assertThat(firstCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -149,10 +154,11 @@ class CachingTest {
                 size = 6
             ) {
                 it.copy(metadata = "0")
-            }
+            },
+            firstCollect
         )
 
-        assertThat(secondCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -160,9 +166,10 @@ class CachingTest {
                 size = 9
             ) {
                 it.copy(metadata = "0")
-            }
+            },
+            secondCollect
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
+        assertEquals(1, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -176,7 +183,7 @@ class CachingTest {
         }
         val firstCollect = pageFlow.collectItemsUntilSize(6)
         val secondCollect = pageFlow.collectItemsUntilSize(9)
-        assertThat(firstCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -184,10 +191,11 @@ class CachingTest {
                 size = 6
             ) {
                 it.copy(metadata = "0")
-            }
+            },
+            firstCollect
         )
 
-        assertThat(secondCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -195,9 +203,10 @@ class CachingTest {
                 size = 9
             ) {
                 it.copy(metadata = "1")
-            }
+            },
+            secondCollect
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
+        assertEquals(1, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -216,7 +225,7 @@ class CachingTest {
         }
         val firstCollect = pageFlow.collectItemsUntilSize(6)
         val secondCollect = pageFlow.collectItemsUntilSize(9)
-        assertThat(firstCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -224,10 +233,11 @@ class CachingTest {
                 size = 6
             ) {
                 it.copy(metadata = "0_1")
-            }
+            },
+            firstCollect
         )
 
-        assertThat(secondCollect).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
@@ -235,9 +245,10 @@ class CachingTest {
                 size = 9
             ) {
                 it.copy(metadata = "0_2")
-            }
+            },
+            secondCollect
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
+        assertEquals(1, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -245,8 +256,8 @@ class CachingTest {
         val job = SupervisorJob()
         val subScope = CoroutineScope(job + Dispatchers.Default)
         val pageFlow = buildPageFlow().cachedIn(subScope, tracker)
-        assertThat(tracker.pageEventFlowCount()).isEqualTo(0)
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(0)
+        assertEquals(0, tracker.pageEventFlowCount())
+        assertEquals(0, tracker.pageDataFlowCount())
         val items = runBlocking {
             pageFlow.collectItemsUntilSize(9) {
                 // see http://b/146676984
@@ -259,29 +270,30 @@ class CachingTest {
             start = 0,
             size = 9
         )
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
+        assertEquals(1, tracker.pageDataFlowCount())
         val items2 = runBlocking {
             pageFlow.collectItemsUntilSize(21) {
                 // see http://b/146676984
                 delay(10)
             }
         }
-        assertThat(items2).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 21
-            )
+            ),
+            items2
         )
-        assertThat(tracker.pageEventFlowCount()).isEqualTo(0)
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(1)
-        assertThat(items).isEqualTo(firstList)
+        assertEquals(0, tracker.pageEventFlowCount())
+        assertEquals(1, tracker.pageDataFlowCount())
+        assertEquals(firstList, items)
         runBlocking {
             job.cancelAndJoin()
         }
-        assertThat(tracker.pageEventFlowCount()).isEqualTo(0)
-        assertThat(tracker.pageDataFlowCount()).isEqualTo(0)
+        assertEquals(0, tracker.pageEventFlowCount())
+        assertEquals(0, tracker.pageDataFlowCount())
     }
 
     @Test
@@ -291,13 +303,14 @@ class CachingTest {
         passive.collectPassivelyIn(testScope)
         testScope.runCurrent()
         // collecting on the paged source will trigger initial page
-        assertThat(passive.items()).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 3
-            )
+            ),
+            passive.items()
         )
         val firstList = buildItems(
             version = 0,
@@ -307,13 +320,13 @@ class CachingTest {
         )
         // another collector is causing more items to be loaded, they should be reflected in the
         // passive one
-        assertThat(flow.collectItemsUntilSize(9)).isEqualTo(firstList)
-        assertThat(passive.items()).isEqualTo(firstList)
+        assertEquals(firstList, flow.collectItemsUntilSize(9))
+        assertEquals(firstList, passive.items())
         val passive2 = ItemCollector(flow)
         passive2.collectPassivelyIn(testScope)
         testScope.runCurrent()
         // a new passive one should receive all existing items immediately
-        assertThat(passive2.items()).isEqualTo(firstList)
+        assertEquals(firstList, passive2.items())
 
         // now we get another collector that'll fetch more pages, it should reflect in passives
         val secondList = buildItems(
@@ -324,9 +337,9 @@ class CachingTest {
         )
         // another collector is causing more items to be loaded, they should be reflected in the
         // passive one
-        assertThat(flow.collectItemsUntilSize(12)).isEqualTo(secondList)
-        assertThat(passive.items()).isEqualTo(secondList)
-        assertThat(passive2.items()).isEqualTo(secondList)
+        assertEquals(secondList, flow.collectItemsUntilSize(12))
+        assertEquals(secondList, passive.items())
+        assertEquals(secondList, passive2.items())
     }
 
     /**
@@ -342,59 +355,63 @@ class CachingTest {
         val subScope = CoroutineScope(coroutineContext + job)
         collector.collectPassivelyIn(subScope)
         testScope.runCurrent()
-        assertThat(collector.items()).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 0,
                 generation = 0,
                 start = 0,
                 size = 3
-            )
+            ),
+            collector.items()
         )
         // finish that collector
         job.cancelAndJoin()
-        assertThat(factory.nextVersion).isEqualTo(1)
+        assertEquals(1, factory.nextVersion)
         repeat(10) {
             factory.invalidateLatest()
             testScope.runCurrent()
         }
         runCurrent()
         // next version is 11, the last paged data we've created has version 10
-        assertThat(factory.nextVersion).isEqualTo(11)
+        assertEquals(11, factory.nextVersion)
 
         // create another collector from shared, should only receive 1 paging data and that
         // should be the latest because previous PagingData is invalidated
         val collector2 = ItemCollector(flow)
         collector2.collectPassivelyIn(testScope)
         testScope.runCurrent()
-        assertThat(collector2.items()).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 10,
                 generation = 0,
                 start = 0,
                 size = 3
-            )
+            ),
+            collector2.items()
         )
-        assertThat(collector2.receivedPagingDataCount).isEqualTo(1)
+        assertEquals(1, collector2.receivedPagingDataCount)
         testScope.runCurrent()
-        assertThat(factory.nextVersion).isEqualTo(11)
+        assertEquals(11, factory.nextVersion)
         val activeCollection = flow.collectItemsUntilSize(9)
-        assertThat(activeCollection).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 10,
                 generation = 0,
                 start = 0,
                 size = 9
-            )
+            ),
+            activeCollection
         )
         testScope.runCurrent()
         // make sure passive collector received those items as well
-        assertThat(collector2.items()).isEqualTo(
+        assertEquals(
             buildItems(
                 version = 10,
                 generation = 0,
                 start = 0,
                 size = 9
-            )
+            ),
+            collector2.items()
         )
     }
 
