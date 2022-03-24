@@ -1874,14 +1874,13 @@ class PageFetcherSnapshotTest {
             awaitIdle()
             retry()
             awaitIdle()
-            assertThat(
-                remoteMediator.loadEventCounts()
-            ).containsExactlyEntriesIn(
+            assertEquals(
                 mapOf(
                     PREPEND to 3,
                     APPEND to 1,
                     REFRESH to 0
-                )
+                ),
+                remoteMediator.loadEventCounts()
             )
         }
     }
@@ -1924,14 +1923,13 @@ class PageFetcherSnapshotTest {
             awaitIdle()
             retry()
             awaitIdle()
-            assertThat(
-                remoteMediator.loadEventCounts()
-            ).containsExactlyEntriesIn(
+            assertEquals(
                 mapOf(
                     PREPEND to 1,
                     APPEND to 3,
                     REFRESH to 0
-                )
+                ),
+                remoteMediator.loadEventCounts()
             )
         }
     }
