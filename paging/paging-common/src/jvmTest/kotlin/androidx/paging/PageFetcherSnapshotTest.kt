@@ -27,7 +27,6 @@ import androidx.paging.PagingSource.LoadResult
 import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.RemoteMediatorMock.LoadEvent
 import androidx.paging.TestPagingSource.Companion.LOAD_ERROR
-import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -3914,7 +3913,7 @@ class PageFetcherSnapshotTest {
             )
             assertTrue(pagingSource.invalid)
             assertTrue(state.newEvents().isEmpty())
-            assertThat(!job.isActive)
+            assertFalse(job.isActive)
         }
     }
 
@@ -3957,7 +3956,7 @@ class PageFetcherSnapshotTest {
             )
             assertTrue(pagingSource.invalid)
             assertTrue(state.newEvents().isEmpty())
-            assertThat(!job.isActive)
+            assertFalse(job.isActive)
         }
     }
 
