@@ -21,17 +21,19 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 
 /**
  * reproduces b/203594733
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 public class CachedPageEventFlowLeakTest {
     private val gcHelper = GarbageCollectionTestHelper()
 
@@ -136,7 +138,7 @@ public class CachedPageEventFlowLeakTest {
     public fun dontLeakCachedPageEventFlows_finished() {
         val scope = CoroutineScope(EmptyCoroutineContext)
         val flow = pager.flow.cachedIn(scope, tracker)
-        runBlocking {
+        runTest {
             collectPages(
                 flow = flow,
                 generationCount = 20,
@@ -157,7 +159,7 @@ public class CachedPageEventFlowLeakTest {
 
     @Test
     public fun dontLeakNonCachedFlow_finished() {
-        runBlocking {
+        runTest {
             collectPages(
                 flow = pager.flow,
                 generationCount = 10,
@@ -171,7 +173,7 @@ public class CachedPageEventFlowLeakTest {
     @Test
     public fun dontLeakPreviousPageInfo_stillCollecting() {
         // reproduces b/204125064
-        runBlocking {
+        runTest {
             val doneInvalidating = CompletableDeferred<Unit>()
             val collection = launch {
                 collectPages(
@@ -201,7 +203,7 @@ public class CachedPageEventFlowLeakTest {
         val scope = CoroutineScope(EmptyCoroutineContext)
         val flow = pager.flow.cachedIn(scope, tracker)
         // reproduces b/204125064
-        runBlocking {
+        runTest {
             val doneInvalidating = CompletableDeferred<Unit>()
             val collection = launch {
                 collectPages(
