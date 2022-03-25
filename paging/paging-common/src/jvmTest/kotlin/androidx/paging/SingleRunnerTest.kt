@@ -18,12 +18,12 @@ package androidx.paging
 
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -176,7 +176,7 @@ class SingleRunnerTest {
             }
         }
         runBlocking {
-            withTimeout(TimeUnit.SECONDS.toMillis(10)) {
+            withTimeout(10.seconds) {
                 job2.join()
             }
         }
