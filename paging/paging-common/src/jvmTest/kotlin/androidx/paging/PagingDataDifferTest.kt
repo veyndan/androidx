@@ -22,9 +22,10 @@ import androidx.paging.LoadType.PREPEND
 import androidx.paging.PageEvent.Drop
 import androidx.paging.PagingSource.LoadResult
 import androidx.testutils.DirectDispatcher
-import androidx.testutils.MainDispatcherRule
 import androidx.testutils.TestDispatcher
 import kotlin.coroutines.ContinuationInterceptor
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -34,6 +35,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -50,18 +52,24 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
-import org.junit.Rule
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
 class PagingDataDifferTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
 
-    @get:Rule
-    val dispatcherRule = MainDispatcherRule(
-        testScope.coroutineContext[ContinuationInterceptor] as CoroutineDispatcher
-    )
+    @BeforeTest
+    fun beforeTest() {
+        Dispatchers.setMain(testScope.coroutineContext[ContinuationInterceptor] as CoroutineDispatcher)
+    }
+
+    @AfterTest
+    fun afterTest() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun collectFrom_static() = testScope.runTest {
