@@ -1,19 +1,18 @@
-// /*
-// * Copyright 2019 The Android Open Source Project
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License");
-// * you may not use this file except in compliance with the License.
-// * You may obtain a copy of the License at
-// *
-// *      http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
-//
+/*
+ * Copyright 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package androidx.paging
 
 import androidx.paging.LoadState.Loading
@@ -36,7 +35,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.collectLatest
@@ -48,7 +46,6 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -1277,210 +1274,210 @@ class PageFetcherTest {
         fetcherState.job.cancel()
     }
 
-    @Suppress("DEPRECATION") // b/220884819
-    @Test
-    fun injectRemoteEvents_remoteLoadAcrossGenerations() = runBlockingTest {
-        val neverEmitCh = Channel<Int>()
-        var generation = 0
-
-        @OptIn(ExperimentalPagingApi::class)
-        val pageFetcher = PageFetcher(
-            pagingSourceFactory = {
-                generation++
-                object : PagingSource<Int, Int>() {
-                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Int> {
-                        // Wait for advanceUntilIdle()
-                        delay(1)
-
-                        return when (generation) {
-                            1 -> Page(
-                                data = listOf(),
-                                prevKey = null,
-                                nextKey = null
-                            )
-                            else -> Page(
-                                data = listOf(3, 4, 5),
-                                prevKey = 2,
-                                nextKey = 6
-                            )
-                        }
-                    }
-
-                    override fun getRefreshKey(state: PagingState<Int, Int>): Int? = null
-                }
-            },
-            initialKey = 0,
-            config = config,
-            remoteMediator = object : RemoteMediator<Int, Int>() {
-                override suspend fun initialize(): InitializeAction = SKIP_INITIAL_REFRESH
-
-                override suspend fun load(
-                    loadType: LoadType,
-                    state: PagingState<Int, Int>
-                ): MediatorResult {
-                    // Wait for advanceUntilIdle()
-                    delay(1)
-
-                    if (loadType == REFRESH) {
-                        return MediatorResult.Success(endOfPaginationReached = false)
-                    }
-
-                    neverEmitCh.receiveCatching()
-                    return MediatorResult.Error(Exception("Unexpected"))
-                }
-            }
-        )
-        val fetcherState = collectFetcherState(pageFetcher)
-
-        assertContentEquals(
-            listOf(
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(
-                        refresh = Loading,
-                    ),
-                )
-            ),
-            fetcherState.newEvents()
-        )
-
-        // Let initial source refresh complete and kick off remote prepend / append.
-        advanceUntilIdle()
-
-        // First generation loads empty list and triggers remote loads.
-        assertContentEquals(
-            listOf(
-                remoteRefresh(
-                    pages = listOf(
-                        TransformablePage(data = listOf())
-                    ),
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                ),
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                    mediator = loadStates(
-                        prepend = Loading,
-                    ),
-                ),
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(
-                        prepend = NotLoading.Complete,
-                        append = NotLoading.Complete,
-                    ),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-            ),
-            fetcherState.newEvents()
-        )
-
-        // Trigger remote + source refresh in a new generation.
-        pageFetcher.refresh()
-
-        assertContentEquals(
-            listOf(
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                )
-            ),
-            fetcherState.newEvents()
-        )
-
-        // Let remote and source refresh finish.
-        advanceUntilIdle()
-
-        // Second generation loads some data and has more to load from source.
-        assertContentEquals(
-            listOf(
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        refresh = Loading,
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    )
-                ),
-                remoteRefresh(
-                    pages = listOf(TransformablePage(data = listOf(3, 4, 5))),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-            ),
-            fetcherState.newEvents()
-        )
-
-        // Trigger remote + source refresh in a third generation.
-        pageFetcher.refresh()
-
-        // Start of third generation should have the exact same load states as before, so we
-        // should only get new events for kicking off new loads.
-        assertContentEquals(
-            listOf(
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-            ),
-            fetcherState.newEvents()
-        )
-
-        // Let remote and source refresh finish.
-        advanceUntilIdle()
-
-        assertContentEquals(
-            listOf(
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        refresh = Loading,
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-                remoteLoadStateUpdate<Int>(
-                    source = loadStates(refresh = Loading),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    )
-                ),
-                remoteRefresh(
-                    pages = listOf(TransformablePage(data = listOf(3, 4, 5))),
-                    mediator = loadStates(
-                        prepend = Loading,
-                        append = Loading,
-                    ),
-                ),
-            ),
-            fetcherState.newEvents()
-        )
-
-        neverEmitCh.close()
-        fetcherState.job.cancel()
-    }
+//    @Suppress("DEPRECATION") // b/220884819
+//    @Test
+//    fun injectRemoteEvents_remoteLoadAcrossGenerations() = runBlockingTest {
+//        val neverEmitCh = Channel<Int>()
+//        var generation = 0
+//
+//        @OptIn(ExperimentalPagingApi::class)
+//        val pageFetcher = PageFetcher(
+//            pagingSourceFactory = {
+//                generation++
+//                object : PagingSource<Int, Int>() {
+//                    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Int> {
+//                        // Wait for advanceUntilIdle()
+//                        delay(1)
+//
+//                        return when (generation) {
+//                            1 -> Page(
+//                                data = listOf(),
+//                                prevKey = null,
+//                                nextKey = null
+//                            )
+//                            else -> Page(
+//                                data = listOf(3, 4, 5),
+//                                prevKey = 2,
+//                                nextKey = 6
+//                            )
+//                        }
+//                    }
+//
+//                    override fun getRefreshKey(state: PagingState<Int, Int>): Int? = null
+//                }
+//            },
+//            initialKey = 0,
+//            config = config,
+//            remoteMediator = object : RemoteMediator<Int, Int>() {
+//                override suspend fun initialize(): InitializeAction = SKIP_INITIAL_REFRESH
+//
+//                override suspend fun load(
+//                    loadType: LoadType,
+//                    state: PagingState<Int, Int>
+//                ): MediatorResult {
+//                    // Wait for advanceUntilIdle()
+//                    delay(1)
+//
+//                    if (loadType == REFRESH) {
+//                        return MediatorResult.Success(endOfPaginationReached = false)
+//                    }
+//
+//                    neverEmitCh.receiveCatching()
+//                    return MediatorResult.Error(Exception("Unexpected"))
+//                }
+//            }
+//        )
+//        val fetcherState = collectFetcherState(pageFetcher)
+//
+//        assertContentEquals(
+//            listOf(
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(
+//                        refresh = Loading,
+//                    ),
+//                )
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        // Let initial source refresh complete and kick off remote prepend / append.
+//        advanceUntilIdle()
+//
+//        // First generation loads empty list and triggers remote loads.
+//        assertContentEquals(
+//            listOf(
+//                remoteRefresh(
+//                    pages = listOf(
+//                        TransformablePage(data = listOf())
+//                    ),
+//                    source = loadStates(
+//                        prepend = NotLoading.Complete,
+//                        append = NotLoading.Complete,
+//                    ),
+//                ),
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(
+//                        prepend = NotLoading.Complete,
+//                        append = NotLoading.Complete,
+//                    ),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                    ),
+//                ),
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(
+//                        prepend = NotLoading.Complete,
+//                        append = NotLoading.Complete,
+//                    ),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        // Trigger remote + source refresh in a new generation.
+//        pageFetcher.refresh()
+//
+//        assertContentEquals(
+//            listOf(
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                )
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        // Let remote and source refresh finish.
+//        advanceUntilIdle()
+//
+//        // Second generation loads some data and has more to load from source.
+//        assertContentEquals(
+//            listOf(
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        refresh = Loading,
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    )
+//                ),
+//                remoteRefresh(
+//                    pages = listOf(TransformablePage(data = listOf(3, 4, 5))),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        // Trigger remote + source refresh in a third generation.
+//        pageFetcher.refresh()
+//
+//        // Start of third generation should have the exact same load states as before, so we
+//        // should only get new events for kicking off new loads.
+//        assertContentEquals(
+//            listOf(
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        // Let remote and source refresh finish.
+//        advanceUntilIdle()
+//
+//        assertContentEquals(
+//            listOf(
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        refresh = Loading,
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//                remoteLoadStateUpdate<Int>(
+//                    source = loadStates(refresh = Loading),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    )
+//                ),
+//                remoteRefresh(
+//                    pages = listOf(TransformablePage(data = listOf(3, 4, 5))),
+//                    mediator = loadStates(
+//                        prepend = Loading,
+//                        append = Loading,
+//                    ),
+//                ),
+//            ),
+//            fetcherState.newEvents()
+//        )
+//
+//        neverEmitCh.close()
+//        fetcherState.job.cancel()
+//    }
 
     @Test
     fun injectRemoteEvents_doesNotKeepOldGenerationActive() = testScope.runTest {

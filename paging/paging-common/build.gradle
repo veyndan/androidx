@@ -32,6 +32,12 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            languageSettings {
+                progressiveMode = true
+                optIn("kotlin.ExperimentalPagingApi")
+            }
+        }
         commonMain {
             dependencies {
                 api(libs.kotlinStdlibCommon)

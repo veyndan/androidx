@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package androidx.paging
 import androidx.paging.PagingSource.LoadParams
 import androidx.paging.PagingSource.LoadResult
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -386,8 +387,8 @@ class PagingSourceTest {
             Item(
                 names[it % 10],
                 it,
-                Math.random() * 1000,
-                (Math.random() * 200).toInt().toString() + " fake st."
+                Random.nextDouble() * 1000,
+                (Random.nextDouble() * 200).toInt().toString() + " fake st."
             )
         }.sortedWith(ITEM_COMPARATOR)
 
