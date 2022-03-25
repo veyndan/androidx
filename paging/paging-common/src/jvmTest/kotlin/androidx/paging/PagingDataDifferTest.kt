@@ -57,7 +57,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class, ExperimentalStdlibApi::class)
 class PagingDataDifferTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
 
@@ -1072,7 +1072,7 @@ class PagingDataDifferTest {
         val collectLoadStates = differ.collectLoadStates()
 
         // execute queued initial REFRESH
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(50 until 59, differ.snapshot())
         assertContentEquals(
@@ -1086,7 +1086,7 @@ class PagingDataDifferTest {
         differ.refresh()
 
         // execute second REFRESH load
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
@@ -1113,7 +1113,7 @@ class PagingDataDifferTest {
         }
         val collectLoadStates = differ.collectLoadStates()
         // execute initial refresh
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
         assertContentEquals(0 until 9, differ.snapshot())
         assertContentEquals(
             listOf(
@@ -1131,7 +1131,7 @@ class PagingDataDifferTest {
         differ.refresh()
         // after a refresh, make sure the loading event comes in 1 piece w/ the end of pagination
         // reset
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
         assertContentEquals(
             listOf(
                 localLoadStatesOf(
@@ -1206,7 +1206,7 @@ class PagingDataDifferTest {
 
         // using poll().run() instead of executeAll, otherwise this invalid APPEND + subsequent
         // REFRESH will auto run consecutively and we won't be able to assert them incrementally
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertEquals(2, pagingSources.size)
         assertContentEquals(
@@ -1227,7 +1227,7 @@ class PagingDataDifferTest {
         )
 
         // the LoadResult.Invalid from failed APPEND triggers new pagingSource + initial REFRESH
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(11 until 20, differ.snapshot())
         assertContentEquals(
@@ -1276,7 +1276,7 @@ class PagingDataDifferTest {
         // do an invalid prepend which will return LoadResult.Invalid
         differ[0]
         pagingSources[0].nextLoadResult = LoadResult.Invalid()
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertEquals(2, pagingSources.size)
         assertContentEquals(
@@ -1292,7 +1292,7 @@ class PagingDataDifferTest {
         )
 
         // the LoadResult.Invalid from failed PREPEND triggers new pagingSource + initial REFRESH
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // load starts from 0 again because the provided initialKey = 50 is not multi-generational
         assertContentEquals(0 until 9, differ.snapshot())
@@ -1313,7 +1313,7 @@ class PagingDataDifferTest {
 
         // execute queued initial REFRESH load which will return LoadResult.Invalid()
         pagingSources[0].nextLoadResult = LoadResult.Invalid()
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertTrue(differ.snapshot().isEmpty())
         assertContentEquals(
@@ -1324,7 +1324,7 @@ class PagingDataDifferTest {
         )
 
         // execute second REFRESH load
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // second refresh still loads from initialKey = 50 because anchorPosition/refreshKey is null
         assertEquals(2, pagingSources.size)
@@ -1361,7 +1361,7 @@ class PagingDataDifferTest {
         val exception = Throwable()
         pagingSources[0].nextLoadResult = LoadResult.Error(exception)
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(
             listOf(
@@ -1380,7 +1380,7 @@ class PagingDataDifferTest {
 
         // retry append
         differ.retry()
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // make sure append success
         assertContentEquals(0 until 12, differ.snapshot())
@@ -1424,7 +1424,7 @@ class PagingDataDifferTest {
         val exception = Throwable()
         pagingSources[0].nextLoadResult = LoadResult.Error(exception)
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(
             listOf(
@@ -1438,7 +1438,7 @@ class PagingDataDifferTest {
         // retry prepend
         differ.retry()
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // make sure prepend success
         assertContentEquals(47 until 59, differ.snapshot())
@@ -1477,7 +1477,7 @@ class PagingDataDifferTest {
         // retry refresh
         differ.retry()
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // refresh retry does not trigger new gen
         assertContentEquals(0 until 9, differ.snapshot())
@@ -1518,7 +1518,7 @@ class PagingDataDifferTest {
         val exception = Throwable()
         pagingSources[0].nextLoadResult = LoadResult.Error(exception)
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(
             listOf(
@@ -1530,7 +1530,7 @@ class PagingDataDifferTest {
 
         // refresh() should reset local LoadStates and trigger new REFRESH
         differ.refresh()
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         // Initial load starts from 0 because initialKey is single gen.
         assertContentEquals(0 until 9, differ.snapshot())
@@ -1572,7 +1572,7 @@ class PagingDataDifferTest {
         // refresh should trigger new generation
         differ.refresh()
 
-        loadDispatcher.queue.poll()?.run()
+        loadDispatcher.queue.removeLastOrNull()?.run()
 
         assertContentEquals(0 until 9, differ.snapshot())
         // Goes directly from Error --> Loading without resetting refresh to NotLoading
