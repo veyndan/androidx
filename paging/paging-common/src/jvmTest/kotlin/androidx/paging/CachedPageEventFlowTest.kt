@@ -93,6 +93,7 @@ class CachedPageEventFlowTest {
         )
         assertTrue(slowCollector.items().isEmpty())
         testScope.advanceTimeBy(3_000)
+        testScope.runCurrent()
         assertContentEquals(
             listOf(
                 refreshEvent,

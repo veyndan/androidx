@@ -53,6 +53,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withContext
@@ -1608,6 +1609,7 @@ class PagingDataDifferTest {
         }
         // allow local refresh to complete but not remote refresh
         advanceTimeBy(600)
+        runCurrent()
 
         assertContentEquals(
             listOf(
@@ -1637,6 +1639,7 @@ class PagingDataDifferTest {
 
         // allow local refresh to complete but not remote refresh
         advanceTimeBy(600)
+        runCurrent()
 
         assertContentEquals(
             listOf(
@@ -1659,6 +1662,7 @@ class PagingDataDifferTest {
 
         // allow remote refresh to complete
         advanceTimeBy(600)
+        runCurrent()
 
         assertContentEquals(
             // remote refresh returns empty and triggers remote append/prepend

@@ -132,6 +132,7 @@ class SingleRunnerTest {
             }
             // don't let delays finish to ensure they are really cancelled
             advanceTimeBy(1)
+            runCurrent()
         }
         // Despite launching separately, with different delays, we should see these always
         // interleave in the same order, since the delays aren't allowed to run in parallel and
@@ -206,6 +207,7 @@ class SingleRunnerTest {
             output.add("unexpected - 2")
         }
         advanceTimeBy(20)
+        runCurrent()
         runner.runInIsolation(
             priority = 3
         ) {

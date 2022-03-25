@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -173,6 +174,7 @@ class SimpleChannelFlowTest {
             channelFlow.toList()
         }
         testScope.advanceTimeBy(250)
+        testScope.runCurrent()
         collection.cancel(CancellationException("test message"))
         collection.join()
         assertContentEquals(listOf(0, 1, 2), dispatched)

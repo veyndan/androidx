@@ -624,6 +624,7 @@ class PageFetcherSnapshotTest {
             )
             // Start hint processing until load starts, but hasn't finished.
             advanceTimeBy(500)
+            runCurrent()
             fetcherState.pagingDataList[0].receiver.accessHint(
                 ViewportHint.Access(
                     pageOffset = 0,
@@ -1121,6 +1122,7 @@ class PageFetcherSnapshotTest {
                 )
             )
             advanceTimeBy(500)
+            runCurrent()
             fetcherState.pagingDataList[0].receiver.accessHint(
                 ViewportHint.Access(
                     pageOffset = 0,
@@ -1355,10 +1357,12 @@ class PageFetcherSnapshotTest {
 
             // Start the initial load, but do not let it finish.
             advanceTimeBy(500)
+            runCurrent()
 
             // Close pager, then advance time by enough to allow initial load to finish.
             pager.close()
             advanceTimeBy(1500)
+            runCurrent()
 
             assertTrue { !job.isActive }
         }
@@ -2668,6 +2672,7 @@ class PageFetcherSnapshotTest {
 
         val state = collectFetcherState(pager)
         advanceTimeBy(1)
+        runCurrent()
 
         assertContentEquals(
             listOf(
@@ -3209,6 +3214,7 @@ class PageFetcherSnapshotTest {
                 // Wait for remote events to get sent and observed by PageFetcher, but don't let
                 // source REFRESH complete yet until we invalidate.
                 advanceTimeBy(500)
+                runCurrent()
                 currentPagingSource!!.invalidate()
                 // Wait for second generation to start before letting remote REFRESH finish, but
                 // ensure that remote REFRESH finishes before source REFRESH does.
@@ -3840,6 +3846,7 @@ class PageFetcherSnapshotTest {
             // Start initial load but this load should return LoadResult.Invalid
             // wait some time for the invalid result handler to close the page event flow
             advanceTimeBy(1000)
+            runCurrent()
 
             assertTrue { !job.isActive }
         }

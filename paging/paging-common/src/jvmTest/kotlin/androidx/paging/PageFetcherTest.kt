@@ -825,6 +825,7 @@ class PageFetcherTest {
         // Allow remote refresh to get triggered, but do not let paging source complete initial load
         // for second generation.
         advanceTimeBy(500)
+        runCurrent()
 
         // Verify remote refresh is called with PagingState from first generation.
         val pagingState = PagingState(
@@ -1030,6 +1031,7 @@ class PageFetcherTest {
 
             // Invalidate second generation before it has a chance to complete initial load.
             advanceTimeBy(500)
+            runCurrent()
             pagingSources[1].invalidate()
 
             // Wait for all non-canceled loads to complete.
