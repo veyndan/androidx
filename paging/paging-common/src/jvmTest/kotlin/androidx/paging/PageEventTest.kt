@@ -27,8 +27,6 @@ import kotlin.test.assertSame
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
 internal fun <T : Any> adjacentInsertEvent(
     isPrepend: Boolean,
@@ -274,13 +272,8 @@ class PageEventTest {
         )
     }
 
-    @RunWith(Parameterized::class)
-    class StaticPagingData(
-        private val original: PagingData<String>
-    ) {
+    class StaticPagingData {
         companion object {
-            @JvmStatic
-            @Parameterized.Parameters(name = "original = {0}")
             fun initParameters() = listOf(
                 PagingData.from(listOf("a", "b", "c")),
                 PagingData.empty(),
@@ -291,6 +284,10 @@ class PageEventTest {
 
         @Test
         fun map() = runTest(UnconfinedTestDispatcher()) {
+            initParameters().forEach { map(it) }
+        }
+
+        private suspend fun map(original: PagingData<String>) {
             val transform = { it: String -> it + it }
             differ.collectFrom(original)
             val originalItems = differ.snapshot().items
@@ -302,6 +299,10 @@ class PageEventTest {
 
         @Test
         fun flatMap() = runTest(UnconfinedTestDispatcher()) {
+            initParameters().forEach { flatMap(it) }
+        }
+
+        private suspend fun flatMap(original: PagingData<String>) {
             val transform = { it: String -> listOf(it, it) }
             differ.collectFrom(original)
             val originalItems = differ.snapshot().items
@@ -313,6 +314,10 @@ class PageEventTest {
 
         @Test
         fun filter() = runTest(UnconfinedTestDispatcher()) {
+            initParameters().forEach { filter(it) }
+        }
+
+        private suspend fun filter(original: PagingData<String>) {
             val predicate = { it: String -> it != "b" }
             differ.collectFrom(original)
             val originalItems = differ.snapshot().items
@@ -324,6 +329,10 @@ class PageEventTest {
 
         @Test
         fun insertSeparators() = runTest(UnconfinedTestDispatcher()) {
+            initParameters().forEach { insertSeparators(it) }
+        }
+
+        private suspend fun insertSeparators(original: PagingData<String>) {
             val transform = { left: String?, right: String? ->
                 if (left == null || right == null) null else "|"
             }

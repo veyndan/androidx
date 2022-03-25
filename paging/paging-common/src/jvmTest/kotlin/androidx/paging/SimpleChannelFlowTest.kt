@@ -45,31 +45,32 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
-@RunWith(Parameterized::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class SimpleChannelFlowTest(
-    private val impl: Impl
-) {
+class SimpleChannelFlowTest {
     val testScope = TestScope(UnconfinedTestDispatcher())
 
     @Test
-    fun basic() {
-        val channelFlow = createFlow<Int> {
+    fun basic() = testScope.runTest {
+        params().forEach { basic(it) }
+    }
+
+    private suspend fun basic(impl: Impl) {
+        val channelFlow = createFlow<Int>(impl) {
             send(1)
             send(2)
         }
-        testScope.runTest {
-            val items = channelFlow.toList()
-            assertContentEquals(listOf(1, 2), items)
-        }
+        val items = channelFlow.toList()
+        assertContentEquals(listOf(1, 2), items)
     }
 
     @Test
-    fun emitWithLaunch() {
-        val channelFlow = createFlow<Int> {
+    fun emitWithLaunch() = testScope.runTest {
+        params().forEach { emitWithLaunch(it) }
+    }
+
+    private suspend fun emitWithLaunch(impl: Impl) {
+        val channelFlow = createFlow<Int>(impl) {
             launch(coroutineContext, CoroutineStart.UNDISPATCHED) {
                 send(1)
                 delay(100)
@@ -77,54 +78,60 @@ class SimpleChannelFlowTest(
             }
             send(3)
         }
-        testScope.runTest {
-            val items = channelFlow.toList()
-            assertContentEquals(listOf(1, 3, 2), items)
-        }
+        val items = channelFlow.toList()
+        assertContentEquals(listOf(1, 3, 2), items)
     }
 
     @Test
-    fun closedByCollector() {
+    fun closedByCollector() = testScope.runTest {
+        params().forEach { closedByCollector(it) }
+    }
+
+    private suspend fun closedByCollector(impl: Impl) {
         val emittedValues = mutableListOf<Int>()
-        val channelFlow = createFlow<Int> {
+        val channelFlow = createFlow<Int>(impl) {
             repeat(10) {
                 send(it)
                 emittedValues.add(it)
             }
         }
-        testScope.runTest {
-            assertContentEquals(listOf(0, 1, 2, 3), channelFlow.take(4).toList())
-            assertContentEquals((0..9).toList(), emittedValues)
-        }
+        assertContentEquals(listOf(0, 1, 2, 3), channelFlow.take(4).toList())
+        assertContentEquals((0..9).toList(), emittedValues)
     }
 
     @Test
-    fun closedByCollector_noBuffer() {
+    fun closedByCollector_noBuffer() = testScope.runTest {
+        params().forEach { closedByCollector_noBuffer(it) }
+    }
+
+    private suspend fun closedByCollector_noBuffer(impl: Impl) {
         val emittedValues = mutableListOf<Int>()
-        val channelFlow = createFlow<Int> {
+        val channelFlow = createFlow<Int>(impl) {
             repeat(10) {
                 send(it)
                 emittedValues.add(it)
             }
         }
-        testScope.runTest {
-            assertContentEquals(listOf(0, 1, 2, 3), channelFlow.buffer(0).take(4).toList())
-            when (impl) {
-                Impl.CHANNEL_FLOW -> {
-                    assertContentEquals(listOf(0, 1, 2, 3), emittedValues)
-                }
-                else -> {
-                    // simple channel flow cannot fuse properly, hence has an extra value
-                    assertContentEquals(listOf(0, 1, 2, 3, 4), emittedValues)
-                }
+        assertContentEquals(listOf(0, 1, 2, 3), channelFlow.buffer(0).take(4).toList())
+        when (impl) {
+            Impl.CHANNEL_FLOW -> {
+                assertContentEquals(listOf(0, 1, 2, 3), emittedValues)
+            }
+            else -> {
+                // simple channel flow cannot fuse properly, hence has an extra value
+                assertContentEquals(listOf(0, 1, 2, 3, 4), emittedValues)
             }
         }
     }
 
     @Test
-    fun awaitClose() {
+    fun awaitClose() = testScope.runTest {
+        params().forEach { awaitClose(it) }
+    }
+
+    private suspend fun awaitClose(impl: Impl) {
         val lastDispatched = CompletableDeferred<Int>()
-        val channelFlow = createFlow<Int> {
+        val channelFlow = createFlow<Int>(impl) {
             var dispatched = -1
             launch {
                 repeat(10) {
@@ -138,17 +145,19 @@ class SimpleChannelFlowTest(
                 lastDispatched.complete(dispatched)
             }
         }
-        testScope.runTest {
-            channelFlow.takeWhile { it < 3 }.toList()
-            assertEquals(3, lastDispatched.await())
-        }
+        channelFlow.takeWhile { it < 3 }.toList()
+        assertEquals(3, lastDispatched.await())
     }
 
     @Test
-    fun scopeGetsCancelled() {
+    fun scopeGetsCancelled() = testScope.runTest {
+        params().forEach { scopeGetsCancelled(it) }
+    }
+
+    private suspend fun scopeGetsCancelled(impl: Impl) {
         var producerException: Throwable? = null
         val dispatched = mutableListOf<Int>()
-        val channelFlow = createFlow<Int> {
+        val channelFlow = createFlow<Int>(impl) {
             try {
                 repeat(20) {
                     send(it)
@@ -160,22 +169,24 @@ class SimpleChannelFlowTest(
                 throw th
             }
         }
-        testScope.runTest {
-            val collection = launch {
-                channelFlow.toList()
-            }
-            advanceTimeBy(250)
-            collection.cancel(CancellationException("test message"))
-            collection.join()
-            assertContentEquals(listOf(0, 1, 2), dispatched)
-            assertContains(producerException!!.message!!, "test message")
+        val collection = testScope.launch {
+            channelFlow.toList()
         }
+        testScope.advanceTimeBy(250)
+        collection.cancel(CancellationException("test message"))
+        collection.join()
+        assertContentEquals(listOf(0, 1, 2), dispatched)
+        assertContains(producerException!!.message!!, "test message")
     }
 
     @Test
-    fun collectorThrows() {
+    fun collectorThrows() = testScope.runTest {
+        params().forEach { collectorThrows(it) }
+    }
+
+    private suspend fun collectorThrows(impl: Impl) {
         var producerException: Throwable? = null
-        val channelFlow = createFlow<Int> {
+        val channelFlow = createFlow<Int>(impl) {
             try {
                 send(1)
                 delay(1000)
@@ -185,18 +196,20 @@ class SimpleChannelFlowTest(
                 throw th
             }
         }
-        testScope.runTest {
-            runCatching {
-                channelFlow.collect {
-                    throw IllegalArgumentException("expected failure")
-                }
+        runCatching {
+            channelFlow.collect {
+                throw IllegalArgumentException("expected failure")
             }
         }
         assertContains(producerException!!.message!!, "consumer had failed")
     }
 
     @Test
-    fun upstreamThrows() {
+    fun upstreamThrows() = testScope.runTest {
+        params().forEach { upstreamThrows(it) }
+    }
+
+    private suspend fun upstreamThrows(impl: Impl) {
         var producerException: Throwable? = null
         val upstream = flow<Int> {
             emit(5)
@@ -204,7 +217,7 @@ class SimpleChannelFlowTest(
             emit(13)
         }
         val combinedFlow = upstream.flatMapLatest { upstreamValue ->
-            createFlow<Int> {
+            createFlow<Int>(impl) {
                 try {
                     send(upstreamValue)
                     delay(2000)
@@ -217,28 +230,29 @@ class SimpleChannelFlowTest(
                 }
             }
         }
-        testScope.runTest {
-            assertContentEquals(
-                listOf(5, 13, 26),
-                combinedFlow.toList()
-            )
-        }
+        assertContentEquals(
+            listOf(5, 13, 26),
+            combinedFlow.toList()
+        )
         assertContains(producerException!!.message!!, "Child of the scoped flow was cancelled")
     }
 
     @Test
-    fun cancelingChannelClosesTheFlow() {
-        val flow = createFlow<Int> {
+    fun cancelingChannelClosesTheFlow() = testScope.runTest {
+        params().forEach { cancelingChannelClosesTheFlow(it) }
+    }
+
+    private suspend fun cancelingChannelClosesTheFlow(impl: Impl) {
+        val flow = createFlow<Int>(impl) {
             send(1)
             close()
             awaitCancellation()
         }
-        testScope.runTest {
-            assertContentEquals(listOf(1), flow.toList())
-        }
+        assertContentEquals(listOf(1), flow.toList())
     }
 
     private fun <T> createFlow(
+        impl: Impl,
         block: suspend TestProducerScope<T>.() -> Unit
     ): Flow<T> {
         return when (impl) {
@@ -274,8 +288,6 @@ class SimpleChannelFlowTest(
     }
 
     companion object {
-        @Parameterized.Parameters(name = "impl={0}")
-        @JvmStatic
         fun params() = Impl.values()
     }
 

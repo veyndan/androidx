@@ -36,18 +36,17 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(Parameterized::class)
-class CachedPageEventFlowTest(
-    private val terminationType: TerminationType
-) {
+class CachedPageEventFlowTest {
     private val testScope = TestScope(UnconfinedTestDispatcher())
 
     @Test
     fun slowFastCollectors() = testScope.runTest {
+        params().forEach { slowFastCollectors(it) }
+    }
+
+    private suspend fun slowFastCollectors(terminationType: TerminationType) {
         val upstream = Channel<PageEvent<String>>(Channel.UNLIMITED)
         val subject = CachedPageEventFlow(
             src = upstream.consumeAsFlow(),
@@ -69,7 +68,7 @@ class CachedPageEventFlowTest(
             ),
         )
         upstream.send(refreshEvent)
-        runCurrent()
+        testScope.runCurrent()
         assertContentEquals(
             listOf(refreshEvent),
             fastCollector.items()
@@ -84,7 +83,7 @@ class CachedPageEventFlowTest(
             ),
         )
         upstream.send(appendEvent)
-        runCurrent()
+        testScope.runCurrent()
         assertContentEquals(
             listOf(
                 refreshEvent,
@@ -93,7 +92,7 @@ class CachedPageEventFlowTest(
             fastCollector.items()
         )
         assertTrue(slowCollector.items().isEmpty())
-        advanceTimeBy(3_000)
+        testScope.advanceTimeBy(3_000)
         assertContentEquals(
             listOf(
                 refreshEvent,
@@ -131,12 +130,12 @@ class CachedPageEventFlowTest(
             refreshEvent,
             appendEvent
         ) + manyNewAppendEvents + finalAppendEvent
-        runCurrent()
+        testScope.runCurrent()
         assertContentEquals(fullList, fastCollector.items())
         assertFalse(fastCollector.isActive())
         assertTrue(slowCollector.isActive())
         assertTrue(lateSlowCollector.isActive())
-        advanceUntilIdle()
+        testScope.advanceUntilIdle()
         assertContentEquals(fullList, slowCollector.items())
         assertFalse(slowCollector.isActive())
 
@@ -156,6 +155,10 @@ class CachedPageEventFlowTest(
 
     @Test
     fun ensureSharing() = testScope.runTest {
+        params().forEach { ensureSharing(it) }
+    }
+
+    private suspend fun ensureSharing(terminationType: TerminationType) {
         val refreshEvent = localRefresh(
             listOf(
                 TransformablePage(
@@ -180,14 +183,14 @@ class CachedPageEventFlowTest(
         upstream.send(refreshEvent)
         upstream.send(appendEvent)
         collector1.collectIn(testScope)
-        runCurrent()
+        testScope.runCurrent()
         assertEquals(
             listOf(refreshEvent, appendEvent),
             collector1.items()
         )
         val collector2 = PageCollector(subject.downstreamFlow)
         collector2.collectIn(testScope)
-        runCurrent()
+        testScope.runCurrent()
         val firstSnapshotRefreshEvent = localRefresh(
             listOf(
                 TransformablePage(
@@ -247,14 +250,14 @@ class CachedPageEventFlowTest(
             TerminationType.CLOSE_UPSTREAM -> upstream.close()
             TerminationType.CLOSE_CACHED_EVENT_FLOW -> subject.close()
         }
-        runCurrent()
+        testScope.runCurrent()
         assertFalse(collector1.isActive())
         assertFalse(collector2.isActive())
         assertFalse(collector3.isActive())
         val collector4 = PageCollector(subject.downstreamFlow).also {
             it.collectIn(testScope)
         }
-        runCurrent()
+        testScope.runCurrent()
         // since upstream is closed, this should just close
         assertFalse(collector4.isActive())
         assertContentEquals(
@@ -365,8 +368,6 @@ class CachedPageEventFlowTest(
     }
 
     companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
         fun params() = TerminationType.values()
     }
 
