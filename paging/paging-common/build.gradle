@@ -16,7 +16,7 @@
 
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 plugins {
     id("AndroidXPlugin")
@@ -29,32 +29,36 @@ kotlin {
     }
     js {
         nodejs()
+        binaries.executable()
     }
 
     sourceSets {
         all {
             languageSettings {
                 progressiveMode = true
+                optIn("kotlin.RequiresOptIn")
                 optIn("kotlin.ExperimentalPagingApi")
             }
         }
         commonMain {
             dependencies {
-                api(libs.kotlinStdlibCommon)
-                api(libs.kotlinCoroutinesCore)
+                implementation(libs.kotlinStdlibCommon)
+                implementation(libs.kotlinCoroutinesCore)
                 implementation("co.touchlab:stately-concurrency:1.2.0")
                 implementation("co.touchlab:stately-iso-collections:1.2.0")
             }
         }
         commonTest {
             dependencies {
-                implementation(libs.kotlinTestCommon)
-                implementation(libs.kotlinTestAnnotationsCommon)
+                implementation kotlin("test")
+//                implementation(libs.kotlinTestCommon)
+//                implementation(libs.kotlinTestAnnotationsCommon)
                 implementation(libs.kotlinCoroutinesTest)
             }
         }
         jsMain {
             dependencies {
+                implementation(libs.kotlinStdlibJs)
             }
         }
         jsTest {
@@ -91,7 +95,7 @@ repositories {
 }
 
 // Allow usage of Kotlin's @OptIn.
-tasks.withType(KotlinCompile).configureEach {
+tasks.withType(KotlinCompileCommon).configureEach {
     kotlinOptions {
         freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
     }

@@ -126,6 +126,8 @@ class PageFetcherSnapshotTest {
         )
 
         fetcherState.job.cancel()
+
+//        assertTrue(false)
     }
 
     @Test
