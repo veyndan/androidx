@@ -27,7 +27,7 @@ kotlin {
     jvm {
         withJava()
     }
-    js {
+    js(IR) {
         nodejs()
         binaries.executable()
     }
